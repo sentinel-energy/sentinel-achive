@@ -1,0 +1,1409 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>frictionless.resource &mdash; friendly_data 0.2.2.dev documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> friendly_data
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hands-on.html">Hands-on tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../registry.html">Data registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced.html">Advanced use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devnotes.html">Notes for developers</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">friendly_data</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>frictionless.resource</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for frictionless.resource</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">petl</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">zip_longest</span><span class="p">,</span> <span class="n">chain</span>
+<span class="kn">from</span> <span class="nn">.exception</span> <span class="kn">import</span> <span class="n">FrictionlessException</span>
+<span class="kn">from</span> <span class="nn">.detector</span> <span class="kn">import</span> <span class="n">Detector</span>
+<span class="kn">from</span> <span class="nn">.metadata</span> <span class="kn">import</span> <span class="n">Metadata</span>
+<span class="kn">from</span> <span class="nn">.control</span> <span class="kn">import</span> <span class="n">Control</span>
+<span class="kn">from</span> <span class="nn">.dialect</span> <span class="kn">import</span> <span class="n">Dialect</span>
+<span class="kn">from</span> <span class="nn">.layout</span> <span class="kn">import</span> <span class="n">Layout</span>
+<span class="kn">from</span> <span class="nn">.schema</span> <span class="kn">import</span> <span class="n">Schema</span>
+<span class="kn">from</span> <span class="nn">.header</span> <span class="kn">import</span> <span class="n">Header</span>
+<span class="kn">from</span> <span class="nn">.system</span> <span class="kn">import</span> <span class="n">system</span>
+<span class="kn">from</span> <span class="nn">.row</span> <span class="kn">import</span> <span class="n">Row</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">helpers</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">errors</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">config</span>
+
+
+<span class="c1"># NOTE:</span>
+<span class="c1"># Consider making resource.stats unavailable until it&#39;s fully calculated</span>
+<span class="c1"># Also, review the situation with describe function removing stats (move to infer?)</span>
+
+
+<div class="viewcode-block" id="Resource"><a class="viewcode-back" href="../../api/external.html#frictionless.resource.Resource">[docs]</a><span class="k">class</span> <span class="nc">Resource</span><span class="p">(</span><span class="n">Metadata</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Resource representation.</span>
+
+<span class="sd">    API      | Usage</span>
+<span class="sd">    -------- | --------</span>
+<span class="sd">    Public   | `from frictionless import Resource`</span>
+
+<span class="sd">    This class is one of the cornerstones of of Frictionless framework.</span>
+<span class="sd">    It loads a data source, and allows you to stream its parsed contents.</span>
+<span class="sd">    At the same time, it&#39;s a metadata class data description.</span>
+
+<span class="sd">    ```python</span>
+<span class="sd">    with Resource(&quot;data/table.csv&quot;) as resource:</span>
+<span class="sd">        resource.header == [&quot;id&quot;, &quot;name&quot;]</span>
+<span class="sd">        resource.read_rows() == [</span>
+<span class="sd">            {&#39;id&#39;: 1, &#39;name&#39;: &#39;english&#39;},</span>
+<span class="sd">            {&#39;id&#39;: 2, &#39;name&#39;: &#39;中国人&#39;},</span>
+<span class="sd">        ]</span>
+<span class="sd">    ```</span>
+
+<span class="sd">    Parameters:</span>
+
+<span class="sd">        source (any): Source of the resource; can be in various forms.</span>
+<span class="sd">            Usually, it&#39;s a string as `&lt;scheme&gt;://path/to/file.&lt;format&gt;`.</span>
+<span class="sd">            It also can be, for example, an array of data arrays/dictionaries.</span>
+<span class="sd">            Or it can be a resource descriptor dict or path.</span>
+
+<span class="sd">        descriptor (dict|str): A resource descriptor provided explicitly.</span>
+<span class="sd">            Keyword arguments will patch this descriptor if provided.</span>
+
+<span class="sd">        name? (str): A Resource name according to the specs.</span>
+<span class="sd">            It should be a slugified name of the resource.</span>
+
+<span class="sd">        title? (str): A Resource title according to the specs</span>
+<span class="sd">           It should a human-oriented title of the resource.</span>
+
+<span class="sd">        description? (str): A Resource description according to the specs</span>
+<span class="sd">           It should a human-oriented description of the resource.</span>
+
+<span class="sd">        mediatype? (str): A mediatype/mimetype of the resource e.g. “text/csv”,</span>
+<span class="sd">            or “application/vnd.ms-excel”.  Mediatypes are maintained by the</span>
+<span class="sd">            Internet Assigned Numbers Authority (IANA) in a media type registry.</span>
+
+<span class="sd">        licenses? (dict[]): The license(s) under which the resource is provided.</span>
+<span class="sd">            If omitted it&#39;s considered the same as the package&#39;s licenses.</span>
+
+<span class="sd">        sources? (dict[]): The raw sources for this data resource.</span>
+<span class="sd">            It MUST be an array of Source objects.</span>
+<span class="sd">            Each Source object MUST have a title and</span>
+<span class="sd">            MAY have path and/or email properties.</span>
+
+<span class="sd">        profile? (str): A string identifying the profile of this descriptor.</span>
+<span class="sd">            For example, `tabular-data-resource`.</span>
+
+<span class="sd">        scheme? (str): Scheme for loading the file (file, http, ...).</span>
+<span class="sd">            If not set, it&#39;ll be inferred from `source`.</span>
+
+<span class="sd">        format? (str): File source&#39;s format (csv, xls, ...).</span>
+<span class="sd">            If not set, it&#39;ll be inferred from `source`.</span>
+
+<span class="sd">        hashing? (str): An algorithm to hash data.</span>
+<span class="sd">            It defaults to &#39;md5&#39;.</span>
+
+<span class="sd">        encoding? (str): Source encoding.</span>
+<span class="sd">            If not set, it&#39;ll be inferred from `source`.</span>
+
+<span class="sd">        innerpath? (str): A path within the compressed file.</span>
+<span class="sd">            It defaults to the first file in the archive.</span>
+
+<span class="sd">        compression? (str): Source file compression (zip, ...).</span>
+<span class="sd">            If not set, it&#39;ll be inferred from `source`.</span>
+
+<span class="sd">        control? (dict|Control): File control.</span>
+<span class="sd">            For more information, please check the Control documentation.</span>
+
+<span class="sd">        dialect? (dict|Dialect): Table dialect.</span>
+<span class="sd">            For more information, please check the Dialect documentation.</span>
+
+<span class="sd">        layout? (dict|Layout): Table layout.</span>
+<span class="sd">            For more information, please check the Layout documentation.</span>
+
+<span class="sd">        schema? (dict|Schema): Table schema.</span>
+<span class="sd">            For more information, please check the Schema documentation.</span>
+
+<span class="sd">        stats? (dict): File/table stats.</span>
+<span class="sd">            A dict with the following possible properties: hash, bytes, fields, rows.</span>
+
+<span class="sd">        basepath? (str): A basepath of the resource</span>
+<span class="sd">            The fullpath of the resource is joined `basepath` and /path`</span>
+
+<span class="sd">        detector? (Detector): File/table detector.</span>
+<span class="sd">            For more information, please check the Detector documentation.</span>
+
+<span class="sd">        onerror? (ignore|warn|raise): Behaviour if there is an error.</span>
+<span class="sd">            It defaults to &#39;ignore&#39;. The default mode will ignore all errors</span>
+<span class="sd">            on resource level and they should be handled by the user</span>
+<span class="sd">            being available in Header and Row objects.</span>
+
+<span class="sd">        trusted? (bool): Don&#39;t raise an exception on unsafe paths.</span>
+<span class="sd">            A path provided as a part of the descriptor considered unsafe</span>
+<span class="sd">            if there are path traversing or the path is absolute.</span>
+<span class="sd">            A path provided as `source` or `path` is alway trusted.</span>
+
+<span class="sd">        package? (Package): A owning this resource package.</span>
+<span class="sd">            It&#39;s actual if the resource is part of some data package.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        FrictionlessException: raise any error that occurs during the process</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">descriptor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="c1"># Spec</span>
+        <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">mediatype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">licenses</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">sources</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">profile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scheme</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">hashing</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">innerpath</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">compression</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">control</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dialect</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">layout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">schema</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">stats</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="c1"># Extra</span>
+        <span class="n">basepath</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">detector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">onerror</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span>
+        <span class="n">trusted</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">package</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+
+        <span class="c1"># Handle source</span>
+        <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">basepath</span><span class="o">=</span><span class="n">basepath</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;table&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">path</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">path</span>
+                <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">data</span>
+            <span class="k">elif</span> <span class="n">descriptor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">descriptor</span> <span class="o">=</span> <span class="n">source</span>
+
+        <span class="c1"># Handle pathlib</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">descriptor</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+            <span class="n">descriptor</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">descriptor</span><span class="p">)</span>
+
+        <span class="c1"># Handle trusted</span>
+        <span class="k">if</span> <span class="n">descriptor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">trusted</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Store state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__loader</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__parser</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sample</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__labels</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__fragment</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__header</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__lookup</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__byte_stream</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__text_stream</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__list_stream</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__row_stream</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__row_number</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__row_position</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__field_positions</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__fragment_positions</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Store extra</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__basepath</span> <span class="o">=</span> <span class="n">basepath</span> <span class="ow">or</span> <span class="n">helpers</span><span class="o">.</span><span class="n">parse_basepath</span><span class="p">(</span><span class="n">descriptor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__detector</span> <span class="o">=</span> <span class="n">detector</span> <span class="ow">or</span> <span class="n">Detector</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__onerror</span> <span class="o">=</span> <span class="n">onerror</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__trusted</span> <span class="o">=</span> <span class="n">trusted</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__package</span> <span class="o">=</span> <span class="n">package</span>
+
+        <span class="c1"># Store specs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;mediatype&quot;</span><span class="p">,</span> <span class="n">mediatype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;licenses&quot;</span><span class="p">,</span> <span class="n">licenses</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;sources&quot;</span><span class="p">,</span> <span class="n">sources</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;profile&quot;</span><span class="p">,</span> <span class="n">profile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;scheme&quot;</span><span class="p">,</span> <span class="n">scheme</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;format&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;hashing&quot;</span><span class="p">,</span> <span class="n">hashing</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;encoding&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;compression&quot;</span><span class="p">,</span> <span class="n">compression</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;innerpath&quot;</span><span class="p">,</span> <span class="n">innerpath</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;control&quot;</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;dialect&quot;</span><span class="p">,</span> <span class="n">dialect</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;layout&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;schema&quot;</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;stats&quot;</span><span class="p">,</span> <span class="n">stats</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">descriptor</span><span class="p">)</span>
+
+        <span class="c1"># NOTE: it will not work if dialect is a path</span>
+        <span class="c1"># Handle official dialect.header</span>
+        <span class="n">dialect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dialect&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dialect</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="n">dialect</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;header&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">header</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;layout&quot;</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;layout&quot;</span><span class="p">][</span><span class="s2">&quot;header&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Handle official hash/bytes/rows</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;hash&quot;</span><span class="p">,</span> <span class="s2">&quot;bytes&quot;</span><span class="p">,</span> <span class="s2">&quot;rows&quot;</span><span class="p">]:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">value</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;hash&quot;</span><span class="p">:</span>
+                    <span class="n">hashing</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">parse_resource_hash</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">hashing</span> <span class="o">!=</span> <span class="n">config</span><span class="o">.</span><span class="n">DEFAULT_HASHING</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;hashing&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hashing</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;stats&quot;</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;stats&quot;</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="c1"># Handle deprecated url</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">url</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">path</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;Property &quot;url&quot; is deprecated. Please use &quot;path&quot; instead.&#39;</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Handle deprecated compression</span>
+        <span class="n">compression</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;compression&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">compression</span> <span class="o">==</span> <span class="s2">&quot;no&quot;</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;Compression &quot;no&quot; is deprecated. Please use &quot;&quot; compression.&#39;</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;compression&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;basepath&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__basepath</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;onerror&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__onerror</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;trusted&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__trusted</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;package&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__package</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata_process</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">helpers</span><span class="o">.</span><span class="n">ensure_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__row_stream</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">            str: resource name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__file</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">title</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">            str: resource title</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">description</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">            str: resource description</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">mediatype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">            str: resource mediatype</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mediatype&quot;</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">licenses</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">            dict[]: resource licenses</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;licenses&quot;</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">sources</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">            dict[]: resource sources</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sources&quot;</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">profile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">            str?: resource profile</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">default</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">DEFAULT_RESOURCE_PROFILE</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tabular</span><span class="p">:</span>
+            <span class="n">default</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">DEFAULT_TABULAR_RESOURCE_PROFILE</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;profile&quot;</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">            str?: resource path</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__file</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">            any[][]?: resource data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__file</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">scheme</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">            str?: resource scheme</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scheme&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__file</span><span class="o">.</span><span class="n">scheme</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">            str?: resource format</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;format&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__file</span><span class="o">.</span><span class="n">format</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">hashing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">            str?: resource hashing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hashing&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">DEFAULT_HASHING</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">            str?: resource encoding</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;encoding&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">DEFAULT_ENCODING</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">innerpath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">            str?: resource compression path</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;innerpath&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__file</span><span class="o">.</span><span class="n">innerpath</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">compression</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">            str?: resource compression</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;compression&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__file</span><span class="o">.</span><span class="n">compression</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">control</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">            Control?: resource control</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">control</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;control&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">control</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">control</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">create_control</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descriptor</span><span class="o">=</span><span class="n">control</span><span class="p">)</span>
+            <span class="n">control</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_attach</span><span class="p">(</span><span class="s2">&quot;control&quot;</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">control</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+            <span class="n">control</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">create_control</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descriptor</span><span class="o">=</span><span class="n">control</span><span class="p">)</span>
+            <span class="n">control</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_attach</span><span class="p">(</span><span class="s2">&quot;control&quot;</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">control</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">dialect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">            Dialect?: resource dialect</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dialect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dialect&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dialect</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dialect</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">create_dialect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descriptor</span><span class="o">=</span><span class="n">dialect</span><span class="p">)</span>
+            <span class="n">dialect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_attach</span><span class="p">(</span><span class="s2">&quot;dialect&quot;</span><span class="p">,</span> <span class="n">dialect</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dialect</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">dialect</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="n">dialect</span><span class="p">)</span>
+            <span class="n">dialect</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">create_control</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descriptor</span><span class="o">=</span><span class="n">dialect</span><span class="p">)</span>
+            <span class="n">dialect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_attach</span><span class="p">(</span><span class="s2">&quot;dialect&quot;</span><span class="p">,</span> <span class="n">dialect</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dialect</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">layout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Layout?: table layout</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;layout&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">layout</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">layout</span> <span class="o">=</span> <span class="n">Layout</span><span class="p">()</span>
+            <span class="n">layout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_attach</span><span class="p">(</span><span class="s2">&quot;layout&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">layout</span> <span class="o">=</span> <span class="n">Layout</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="n">layout</span><span class="p">))</span>
+            <span class="n">layout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_attach</span><span class="p">(</span><span class="s2">&quot;layout&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">layout</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">            Schema: resource schema</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;schema&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">schema</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">schema</span> <span class="o">=</span> <span class="n">Schema</span><span class="p">()</span>
+            <span class="n">schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_attach</span><span class="p">(</span><span class="s2">&quot;schema&quot;</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">schema</span> <span class="o">=</span> <span class="n">Schema</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="n">schema</span><span class="p">))</span>
+            <span class="n">schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_attach</span><span class="p">(</span><span class="s2">&quot;schema&quot;</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">schema</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">            dict?: resource stats</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stats&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stats</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">stats</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;hash&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;bytes&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tabular</span><span class="p">:</span>
+                <span class="n">stats</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;rows&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+            <span class="n">stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_attach</span><span class="p">(</span><span class="s2">&quot;stats&quot;</span><span class="p">,</span> <span class="n">stats</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">stats</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;File&#39;s bytes used as a sample</span>
+
+<span class="sd">        These buffer bytes are used to infer characteristics of the</span>
+<span class="sd">        source file (e.g. encoding, ...).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes?: file buffer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parser</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parser</span><span class="o">.</span><span class="n">loader</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parser</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">buffer</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__loader</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__loader</span><span class="o">.</span><span class="n">buffer</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Table&#39;s lists used as sample.</span>
+
+<span class="sd">        These sample rows are used to infer characteristics of the</span>
+<span class="sd">        source file (e.g. schema, ...).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list[]?: table sample</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sample</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str[]?: table labels</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__labels</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">fragment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Table&#39;s lists used as fragment.</span>
+
+<span class="sd">        These fragment rows are used internally to infer characteristics of the</span>
+<span class="sd">        source file (e.g. schema, ...).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list[]?: table fragment</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fragment</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str[]?: table header</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__header</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">write</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">basepath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">            str: resource basepath</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__file</span><span class="o">.</span><span class="n">basepath</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">write</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">fullpath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">            str: resource fullpath</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__file</span><span class="o">.</span><span class="n">fullpath</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">write</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">detector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">            str: resource detector</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__detector</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">write</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">onerror</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            ignore|warn|raise: on error bahaviour</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__onerror</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">write</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">trusted</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: don&#39;t raise an exception on unsafe paths</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__trusted</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">write</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">package</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Package?: parent package</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__package</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="n">write</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">memory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__file</span><span class="o">.</span><span class="n">memory</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="n">write</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">remote</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__file</span><span class="o">.</span><span class="n">remote</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="n">write</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">multipart</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__file</span><span class="o">.</span><span class="n">multipart</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="n">write</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">tabular</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">            bool: if resource is tabular</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__parser</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">system</span><span class="o">.</span><span class="n">create_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">byte_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Byte stream in form of a generator</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            gen&lt;bytes&gt;?: byte stream</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__loader</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__loader</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">create_loader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__loader</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__loader</span><span class="o">.</span><span class="n">byte_stream</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">text_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Text stream in form of a generator</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            gen&lt;str[]&gt;?: text stream</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__loader</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__loader</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">create_loader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__loader</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__loader</span><span class="o">.</span><span class="n">text_stream</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">list_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;List stream in form of a generator</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            gen&lt;any[][]&gt;?: list stream</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parser</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parser</span><span class="o">.</span><span class="n">list_stream</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">row_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Row stream in form of a generator of Row objects</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            gen&lt;Row[]&gt;?: row stream</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__row_stream</span>
+
+    <span class="c1"># Expand</span>
+
+<div class="viewcode-block" id="Resource.expand"><a class="viewcode-back" href="../../api/external.html#frictionless.resource.Resource.expand">[docs]</a>    <span class="k">def</span> <span class="nf">expand</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Expand metadata&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;profile&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">DEFAULT_RESOURCE_PROFILE</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;control&quot;</span><span class="p">),</span> <span class="n">Control</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">expand</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dialect&quot;</span><span class="p">),</span> <span class="n">Dialect</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dialect</span><span class="o">.</span><span class="n">expand</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;layout&quot;</span><span class="p">),</span> <span class="n">Layout</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">expand</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;schema&quot;</span><span class="p">),</span> <span class="n">Schema</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">expand</span><span class="p">()</span></div>
+
+    <span class="c1"># Infer</span>
+
+<div class="viewcode-block" id="Resource.infer"><a class="viewcode-back" href="../../api/external.html#frictionless.resource.Resource.infer">[docs]</a>    <span class="k">def</span> <span class="nf">infer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">stats</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Infer metadata</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            stats? (bool): stream file completely and infer stats</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>
+            <span class="n">note</span> <span class="o">=</span> <span class="s2">&quot;Resource.infer canot be used on a open resource&quot;</span>
+            <span class="k">raise</span> <span class="n">FrictionlessException</span><span class="p">(</span><span class="n">errors</span><span class="o">.</span><span class="n">ResourceError</span><span class="p">(</span><span class="n">note</span><span class="o">=</span><span class="n">note</span><span class="p">))</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">stats</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;stats&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="n">stream</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_stream</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">byte_stream</span>
+            <span class="n">helpers</span><span class="o">.</span><span class="n">pass_through</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span></div>
+
+    <span class="c1"># Open/Close</span>
+
+<div class="viewcode-block" id="Resource.open"><a class="viewcode-back" href="../../api/external.html#frictionless.resource.Resource.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Open the resource as &quot;io.open&quot; does</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            FrictionlessException: any exception that occurs</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="c1"># Infer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;stats&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;profile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">profile</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;scheme&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scheme</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;format&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;hashing&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashing</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">innerpath</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;innerpath&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">innerpath</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compression</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;compression&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compression</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;control&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialect</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;dialect&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialect</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;stats&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span>
+
+        <span class="c1"># Validate</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_errors</span><span class="p">:</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_errors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">raise</span> <span class="n">FrictionlessException</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+
+        <span class="c1"># Open</span>
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="c1"># Table</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tabular</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__parser</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">create_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__parser</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__read_detect_layout</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__read_detect_schema</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__read_detect_lookup</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__read_header</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__row_stream</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__read_row_stream</span><span class="p">()</span>
+                <span class="k">return</span> <span class="bp">self</span>
+
+            <span class="c1"># File</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__loader</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">create_loader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__loader</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+                <span class="k">return</span> <span class="bp">self</span>
+
+        <span class="c1"># Error</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="Resource.close"><a class="viewcode-back" href="../../api/external.html#frictionless.resource.Resource.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Close the table as &quot;filelike.close&quot; does&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parser</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__parser</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__parser</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__loader</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__loader</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__loader</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">closed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Whether the table is closed</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: if closed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parser</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__loader</span> <span class="ow">is</span> <span class="kc">None</span>
+
+    <span class="c1"># Read</span>
+
+<div class="viewcode-block" id="Resource.read_bytes"><a class="viewcode-back" href="../../api/external.html#frictionless.resource.Resource.read_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">read_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read bytes into memory</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            any[][]: resource bytes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">memory</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">helpers</span><span class="o">.</span><span class="n">ensure_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">byte_stream</span><span class="o">.</span><span class="n">read1</span><span class="p">(</span><span class="n">size</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Resource.read_text"><a class="viewcode-back" href="../../api/external.html#frictionless.resource.Resource.read_text">[docs]</a>    <span class="k">def</span> <span class="nf">read_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read text into memory</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: resource text</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">memory</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">helpers</span><span class="o">.</span><span class="n">ensure_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_stream</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">size</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Resource.read_data"><a class="viewcode-back" href="../../api/external.html#frictionless.resource.Resource.read_data">[docs]</a>    <span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read data into memory</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            any: resource data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">with</span> <span class="n">helpers</span><span class="o">.</span><span class="n">ensure_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="Resource.read_lists"><a class="viewcode-back" href="../../api/external.html#frictionless.resource.Resource.read_lists">[docs]</a>    <span class="k">def</span> <span class="nf">read_lists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read lists into memory</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            any[][]: table lists</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">helpers</span><span class="o">.</span><span class="n">ensure_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="n">lists</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">cells</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_stream</span><span class="p">:</span>
+                <span class="n">lists</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">size</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">lists</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">size</span><span class="p">:</span>
+                    <span class="k">break</span>
+            <span class="k">return</span> <span class="n">lists</span></div>
+
+<div class="viewcode-block" id="Resource.read_rows"><a class="viewcode-back" href="../../api/external.html#frictionless.resource.Resource.read_rows">[docs]</a>    <span class="k">def</span> <span class="nf">read_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read rows into memory</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Row[]: table rows</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">helpers</span><span class="o">.</span><span class="n">ensure_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_stream</span><span class="p">:</span>
+                <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">size</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">size</span><span class="p">:</span>
+                    <span class="k">break</span>
+            <span class="k">return</span> <span class="n">rows</span></div>
+
+    <span class="k">def</span> <span class="nf">__read_row_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="c1"># During row streaming we crate a field inf structure</span>
+        <span class="c1"># This structure is optimized and detached version of schema.fields</span>
+        <span class="c1"># We create all data structures in-advance to share them between rows</span>
+
+        <span class="c1"># Create field info</span>
+        <span class="n">field_number</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">field_info</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;names&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;objects&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;positions&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;mapping&quot;</span><span class="p">:</span> <span class="p">{}}</span>
+        <span class="n">iterator</span> <span class="o">=</span> <span class="n">zip_longest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">fields</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__field_positions</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">field</span><span class="p">,</span> <span class="n">field_position</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">field</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">field_number</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">field_info</span><span class="p">[</span><span class="s2">&quot;names&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">field_info</span><span class="p">[</span><span class="s2">&quot;objects&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">to_copy</span><span class="p">())</span>
+            <span class="n">field_info</span><span class="p">[</span><span class="s2">&quot;mapping&quot;</span><span class="p">][</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">field_number</span><span class="p">,</span> <span class="n">field_position</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">field_position</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">field_info</span><span class="p">[</span><span class="s2">&quot;positions&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">field_position</span><span class="p">)</span>
+
+        <span class="c1"># Create state</span>
+        <span class="n">memory_unique</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">memory_primary</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">foreign_groups</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">is_integrity</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">primary_key</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;unique&quot;</span><span class="p">):</span>
+                <span class="n">memory_unique</span><span class="p">[</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">is_integrity</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lookup</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">fk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">foreign_keys</span><span class="p">:</span>
+                <span class="n">group</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">group</span><span class="p">[</span><span class="s2">&quot;sourceName&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fk</span><span class="p">[</span><span class="s2">&quot;reference&quot;</span><span class="p">][</span><span class="s2">&quot;resource&quot;</span><span class="p">]</span>
+                <span class="n">group</span><span class="p">[</span><span class="s2">&quot;sourceKey&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">fk</span><span class="p">[</span><span class="s2">&quot;reference&quot;</span><span class="p">][</span><span class="s2">&quot;fields&quot;</span><span class="p">])</span>
+                <span class="n">group</span><span class="p">[</span><span class="s2">&quot;targetKey&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">fk</span><span class="p">[</span><span class="s2">&quot;fields&quot;</span><span class="p">])</span>
+                <span class="n">foreign_groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+                <span class="n">is_integrity</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Create iterator</span>
+        <span class="n">iterator</span> <span class="o">=</span> <span class="n">chain</span><span class="p">(</span>
+            <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__fragment_positions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fragment</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__read_list_stream</span><span class="p">(),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Create row stream</span>
+        <span class="k">def</span> <span class="nf">row_stream</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__row_number</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">limit_rows</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">offset_rows</span> <span class="ow">or</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">row_position</span><span class="p">,</span> <span class="n">cells</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__row_position</span> <span class="o">=</span> <span class="n">row_position</span>
+
+                <span class="c1"># Offset/offset rows</span>
+                <span class="k">if</span> <span class="n">offset</span><span class="p">:</span>
+                    <span class="n">offset</span> <span class="o">-=</span> <span class="mi">1</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">limit</span> <span class="ow">and</span> <span class="n">limit</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__row_number</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+                <span class="c1"># Create row</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__row_number</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s2">&quot;rows&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__row_number</span>
+                <span class="n">row</span> <span class="o">=</span> <span class="n">Row</span><span class="p">(</span>
+                    <span class="n">cells</span><span class="p">,</span>
+                    <span class="n">field_info</span><span class="o">=</span><span class="n">field_info</span><span class="p">,</span>
+                    <span class="n">row_position</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__row_position</span><span class="p">,</span>
+                    <span class="n">row_number</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__row_number</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="c1"># Unique Error</span>
+                <span class="k">if</span> <span class="n">is_integrity</span> <span class="ow">and</span> <span class="n">memory_unique</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">field_name</span> <span class="ow">in</span> <span class="n">memory_unique</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="n">cell</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">cell</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">match</span> <span class="o">=</span> <span class="n">memory_unique</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span>
+                            <span class="n">memory_unique</span><span class="p">[</span><span class="n">field_name</span><span class="p">][</span><span class="n">cell</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">row_position</span>
+                            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                                <span class="n">func</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">UniqueError</span><span class="o">.</span><span class="n">from_row</span>
+                                <span class="n">note</span> <span class="o">=</span> <span class="s2">&quot;the same as in the row at position </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">match</span>
+                                <span class="n">error</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="n">note</span><span class="p">,</span> <span class="n">field_name</span><span class="o">=</span><span class="n">field_name</span><span class="p">)</span>
+                                <span class="n">row</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+
+                <span class="c1"># Primary Key Error</span>
+                <span class="k">if</span> <span class="n">is_integrity</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">primary_key</span><span class="p">:</span>
+                    <span class="n">cells</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">primary_key</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="kc">None</span><span class="p">}:</span>
+                        <span class="n">note</span> <span class="o">=</span> <span class="s1">&#39;cells composing the primary keys are all &quot;None&quot;&#39;</span>
+                        <span class="n">error</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">PrimaryKeyError</span><span class="o">.</span><span class="n">from_row</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="n">note</span><span class="p">)</span>
+                        <span class="n">row</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">match</span> <span class="o">=</span> <span class="n">memory_primary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span>
+                        <span class="n">memory_primary</span><span class="p">[</span><span class="n">cells</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">row_position</span>
+                        <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                                <span class="n">note</span> <span class="o">=</span> <span class="s2">&quot;the same as in the row at position </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">match</span>
+                                <span class="n">error</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">PrimaryKeyError</span><span class="o">.</span><span class="n">from_row</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="n">note</span><span class="p">)</span>
+                                <span class="n">row</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+
+                <span class="c1"># Foreign Key Error</span>
+                <span class="k">if</span> <span class="n">is_integrity</span> <span class="ow">and</span> <span class="n">foreign_groups</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">foreign_groups</span><span class="p">:</span>
+                        <span class="n">group_lookup</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lookup</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="s2">&quot;sourceName&quot;</span><span class="p">])</span>
+                        <span class="k">if</span> <span class="n">group_lookup</span><span class="p">:</span>
+                            <span class="n">cells</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;targetKey&quot;</span><span class="p">])</span>
+                            <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="kc">None</span><span class="p">}:</span>
+                                <span class="k">continue</span>
+                            <span class="n">match</span> <span class="o">=</span> <span class="n">cells</span> <span class="ow">in</span> <span class="n">group_lookup</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="s2">&quot;sourceKey&quot;</span><span class="p">],</span> <span class="nb">set</span><span class="p">())</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+                                <span class="n">note</span> <span class="o">=</span> <span class="s2">&quot;not found in the lookup table&quot;</span>
+                                <span class="n">error</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">ForeignKeyError</span><span class="o">.</span><span class="n">from_row</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="n">note</span><span class="p">)</span>
+                                <span class="n">row</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+
+                <span class="c1"># Handle errors</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">onerror</span> <span class="o">!=</span> <span class="s2">&quot;ignore&quot;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">row</span><span class="o">.</span><span class="n">valid</span><span class="p">:</span>
+                        <span class="n">error</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">errors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">onerror</span> <span class="o">==</span> <span class="s2">&quot;raise&quot;</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="n">FrictionlessException</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+
+                <span class="c1"># Yield row</span>
+                <span class="k">yield</span> <span class="n">row</span>
+
+        <span class="c1"># Return row stream</span>
+        <span class="k">return</span> <span class="n">row_stream</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__read_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="c1"># Create header</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="n">Header</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__labels</span><span class="p">,</span>
+            <span class="n">fields</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">fields</span><span class="p">,</span>
+            <span class="n">field_positions</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__field_positions</span><span class="p">,</span>
+            <span class="n">row_positions</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">header_rows</span><span class="p">,</span>
+            <span class="n">ignore_case</span><span class="o">=</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">header_case</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Handle errors</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">header</span><span class="o">.</span><span class="n">valid</span><span class="p">:</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">errors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">onerror</span> <span class="o">==</span> <span class="s2">&quot;warn&quot;</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">onerror</span> <span class="o">==</span> <span class="s2">&quot;raise&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">FrictionlessException</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">header</span>
+
+    <span class="k">def</span> <span class="nf">__read_list_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="c1"># Prepare iterator</span>
+        <span class="n">iterator</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">cells</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">position</span><span class="p">,</span> <span class="n">cells</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__parser</span><span class="o">.</span><span class="n">list_stream</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">position</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__parser</span><span class="o">.</span><span class="n">sample</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Stream without filtering</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">:</span>
+            <span class="k">yield from</span> <span class="n">iterator</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Stream with filtering</span>
+        <span class="k">for</span> <span class="n">row_position</span><span class="p">,</span> <span class="n">cells</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">read_filter_rows</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="n">row_position</span><span class="o">=</span><span class="n">row_position</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">row_position</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">read_filter_cells</span><span class="p">(</span>
+                    <span class="n">cells</span><span class="p">,</span> <span class="n">field_positions</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__field_positions</span>
+                <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__read_detect_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parser</span><span class="o">.</span><span class="n">sample</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">detect_layout</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">layout</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">layout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sample</span> <span class="o">=</span> <span class="n">sample</span>
+
+    <span class="k">def</span> <span class="nf">__read_detect_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">labels</span><span class="p">,</span> <span class="n">field_positions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">read_labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">)</span>
+        <span class="n">fragment</span><span class="p">,</span> <span class="n">fragment_positions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">read_fragment</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">)</span>
+        <span class="n">schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">detect_schema</span><span class="p">(</span><span class="n">fragment</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">schema</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">schema</span> <span class="o">=</span> <span class="n">schema</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__labels</span> <span class="o">=</span> <span class="n">labels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__fragment</span> <span class="o">=</span> <span class="n">fragment</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__field_positions</span> <span class="o">=</span> <span class="n">field_positions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__fragment_positions</span> <span class="o">=</span> <span class="n">fragment_positions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s2">&quot;fields&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">schema</span><span class="o">.</span><span class="n">fields</span><span class="p">)</span>
+        <span class="c1"># NOTE: review whether it&#39;s a proper place for this fallback to data resource</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">schema</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">profile</span> <span class="o">=</span> <span class="s2">&quot;data-resource&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__read_detect_lookup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">lookup</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">fk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">foreign_keys</span><span class="p">:</span>
+            <span class="n">source_name</span> <span class="o">=</span> <span class="n">fk</span><span class="p">[</span><span class="s2">&quot;reference&quot;</span><span class="p">][</span><span class="s2">&quot;resource&quot;</span><span class="p">]</span>
+            <span class="n">source_key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">fk</span><span class="p">[</span><span class="s2">&quot;reference&quot;</span><span class="p">][</span><span class="s2">&quot;fields&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">source_name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__package</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">source_name</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__package</span><span class="o">.</span><span class="n">has_resource</span><span class="p">(</span><span class="n">source_name</span><span class="p">):</span>
+                    <span class="n">note</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Failed to handle a foreign key for resource &quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&quot; as resource &quot;</span><span class="si">{</span><span class="n">source_name</span><span class="si">}</span><span class="s1">&quot; does not exist&#39;</span>
+                    <span class="k">raise</span> <span class="n">FrictionlessException</span><span class="p">(</span><span class="n">errors</span><span class="o">.</span><span class="n">ResourceError</span><span class="p">(</span><span class="n">note</span><span class="o">=</span><span class="n">note</span><span class="p">))</span>
+                <span class="n">source_res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__package</span><span class="o">.</span><span class="n">get_resource</span><span class="p">(</span><span class="n">source_name</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">source_res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_copy</span><span class="p">()</span>
+            <span class="n">source_res</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;foreignKeys&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">lookup</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">source_name</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="k">if</span> <span class="n">source_key</span> <span class="ow">in</span> <span class="n">lookup</span><span class="p">[</span><span class="n">source_name</span><span class="p">]:</span>
+                <span class="k">continue</span>
+            <span class="n">lookup</span><span class="p">[</span><span class="n">source_name</span><span class="p">][</span><span class="n">source_key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">source_res</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">with</span> <span class="n">source_res</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">source_res</span><span class="o">.</span><span class="n">row_stream</span><span class="p">:</span>
+                    <span class="n">cells</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">field_name</span><span class="p">)</span> <span class="k">for</span> <span class="n">field_name</span> <span class="ow">in</span> <span class="n">source_key</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="kc">None</span><span class="p">}:</span>
+                        <span class="k">continue</span>
+                    <span class="n">lookup</span><span class="p">[</span><span class="n">source_name</span><span class="p">][</span><span class="n">source_key</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__lookup</span> <span class="o">=</span> <span class="n">lookup</span>
+
+    <span class="c1"># Write</span>
+
+<div class="viewcode-block" id="Resource.write"><a class="viewcode-back" href="../../api/external.html#frictionless.resource.Resource.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write this resource to the target resource</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            target (any|Resource): target or target resource instance</span>
+<span class="sd">            **options (dict): Resource constructor options</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">native</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">Resource</span><span class="p">)</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">to_copy</span><span class="p">()</span> <span class="k">if</span> <span class="n">native</span> <span class="k">else</span> <span class="n">Resource</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">create_parser</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">write_row_stream</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_copy</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">target</span></div>
+
+    <span class="c1"># Import/Export</span>
+
+<div class="viewcode-block" id="Resource.to_dict"><a class="viewcode-back" href="../../api/external.html#frictionless.resource.Resource.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Data can be not serializable (generators/functions)</span>
+        <span class="n">descriptor</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">descriptor</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="k">return</span> <span class="n">descriptor</span></div>
+
+<div class="viewcode-block" id="Resource.to_copy"><a class="viewcode-back" href="../../api/external.html#frictionless.resource.Resource.to_copy">[docs]</a>    <span class="k">def</span> <span class="nf">to_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a copy of the resource&quot;&quot;&quot;</span>
+        <span class="n">descriptor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">Resource</span><span class="p">(</span>
+            <span class="n">descriptor</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">basepath</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__basepath</span><span class="p">,</span>
+            <span class="n">onerror</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__onerror</span><span class="p">,</span>
+            <span class="n">trusted</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__trusted</span><span class="p">,</span>
+            <span class="n">package</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__package</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">options</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">to_snapshot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">snap</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">with</span> <span class="n">helpers</span><span class="o">.</span><span class="n">ensure_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="n">snap</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">to_list</span><span class="p">())</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_stream</span><span class="p">:</span>
+                <span class="n">snap</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">to_list</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">snap</span>
+
+<div class="viewcode-block" id="Resource.to_inline"><a class="viewcode-back" href="../../api/external.html#frictionless.resource.Resource.to_inline">[docs]</a>    <span class="k">def</span> <span class="nf">to_inline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper to export resource as an inline data&quot;&quot;&quot;</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Resource</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">&quot;inline&quot;</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="n">dialect</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">target</span><span class="o">.</span><span class="n">data</span></div>
+
+<div class="viewcode-block" id="Resource.to_pandas"><a class="viewcode-back" href="../../api/external.html#frictionless.resource.Resource.to_pandas">[docs]</a>    <span class="k">def</span> <span class="nf">to_pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper to export resource as an Pandas dataframe&quot;&quot;&quot;</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Resource</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">&quot;pandas&quot;</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="n">dialect</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">target</span><span class="o">.</span><span class="n">data</span></div>
+
+<div class="viewcode-block" id="Resource.from_petl"><a class="viewcode-back" href="../../api/external.html#frictionless.resource.Resource.from_petl">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_petl</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a resource from PETL view&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Resource</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">view</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Resource.to_petl"><a class="viewcode-back" href="../../api/external.html#frictionless.resource.Resource.to_petl">[docs]</a>    <span class="k">def</span> <span class="nf">to_petl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Export resource as a PETL view&quot;&quot;&quot;</span>
+        <span class="n">resource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_copy</span><span class="p">()</span>
+
+        <span class="c1"># Define view</span>
+        <span class="k">class</span> <span class="nc">ResourceView</span><span class="p">(</span><span class="n">petl</span><span class="o">.</span><span class="n">Table</span><span class="p">):</span>
+            <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="k">with</span> <span class="n">resource</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">resource</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">missing</span><span class="p">:</span>
+                        <span class="k">yield</span> <span class="n">resource</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">labels</span>
+                    <span class="k">yield from</span> <span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">cells</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">resource</span><span class="o">.</span><span class="n">row_stream</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ResourceView</span><span class="p">()</span></div>
+
+    <span class="c1"># Metadata</span>
+
+    <span class="n">metadata_duplicate</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">metadata_Error</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">ResourceError</span>
+    <span class="n">metadata_profile</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">RESOURCE_PROFILE</span><span class="p">)</span>
+    <span class="n">metadata_profile</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;control&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]}</span>
+    <span class="n">metadata_profile</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;dialect&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]}</span>
+    <span class="n">metadata_profile</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;layout&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]}</span>
+    <span class="n">metadata_profile</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;schema&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]}</span>
+
+<div class="viewcode-block" id="Resource.metadata_process"><a class="viewcode-back" href="../../api/external.html#frictionless.resource.Resource.metadata_process">[docs]</a>    <span class="k">def</span> <span class="nf">metadata_process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="c1"># File</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__file</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="p">[])),</span>
+            <span class="n">innerpath</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;innerpath&quot;</span><span class="p">),</span>
+            <span class="n">basepath</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__basepath</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Control</span>
+        <span class="n">control</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;control&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">))):</span>
+            <span class="n">control</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">create_control</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descriptor</span><span class="o">=</span><span class="n">control</span><span class="p">)</span>
+            <span class="nb">dict</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;control&quot;</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+
+        <span class="c1"># Dialect</span>
+        <span class="n">dialect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dialect&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dialect</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">))):</span>
+            <span class="n">dialect</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">create_dialect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descriptor</span><span class="o">=</span><span class="n">dialect</span><span class="p">)</span>
+            <span class="nb">dict</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;dialect&quot;</span><span class="p">,</span> <span class="n">dialect</span><span class="p">)</span>
+
+        <span class="c1"># Layout</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;layout&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="n">Layout</span><span class="p">)):</span>
+            <span class="n">layout</span> <span class="o">=</span> <span class="n">Layout</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+            <span class="nb">dict</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;layout&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="p">)</span>
+
+        <span class="c1"># Schema</span>
+        <span class="n">schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;schema&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="n">Schema</span><span class="p">)):</span>
+            <span class="n">schema</span> <span class="o">=</span> <span class="n">Schema</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
+            <span class="nb">dict</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;schema&quot;</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span>
+
+        <span class="c1"># Security</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">trusted</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="s2">&quot;control&quot;</span><span class="p">,</span> <span class="s2">&quot;dialect&quot;</span><span class="p">,</span> <span class="s2">&quot;schema&quot;</span><span class="p">]:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+                    <span class="k">continue</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">path</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">path</span><span class="p">]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">helpers</span><span class="o">.</span><span class="n">is_safe_path</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">path</span><span class="p">):</span>
+                    <span class="n">note</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;path &quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">&quot; is not safe&#39;</span>
+                    <span class="n">error</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">ResourceError</span><span class="p">(</span><span class="n">note</span><span class="o">=</span><span class="n">note</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">FrictionlessException</span><span class="p">(</span><span class="n">error</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Resource.metadata_validate"><a class="viewcode-back" href="../../api/external.html#frictionless.resource.Resource.metadata_validate">[docs]</a>    <span class="k">def</span> <span class="nf">metadata_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">yield from</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">metadata_validate</span><span class="p">()</span>
+
+        <span class="c1"># Control/Dialect</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">metadata_errors</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialect</span><span class="o">.</span><span class="n">metadata_errors</span>
+
+        <span class="c1"># Layout/Schema</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">:</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">metadata_errors</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="p">:</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">metadata_errors</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, SENTINEL Project.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

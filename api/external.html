@@ -1,0 +1,1591 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Package &mdash; friendly_data 0.2.2.dev documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Notes for developers" href="../devnotes.html" />
+    <link rel="prev" title="Datapackage tools" href="api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> friendly_data
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hands-on.html">Hands-on tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../registry.html">Data registry</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../advanced.html">Advanced use</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../advanced.html#api-documentation">API documentation</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../advanced.html#external-packages">External Packages</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-frictionless.resource">Resource</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../devnotes.html">Notes for developers</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">friendly_data</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../advanced.html">Advanced use</a> &raquo;</li>
+        
+      <li>Package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/api/external.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <p>For convenience, documentation for selected sections of the
+<code class="docutils literal notranslate"><span class="pre">frictionless</span></code> API has been included below.</p>
+<div class="section" id="module-frictionless.package">
+<span id="package"></span><h1>Package<a class="headerlink" href="#module-frictionless.package" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="frictionless.package.Package">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">frictionless.package.</span></span><span class="sig-name descname"><span class="pre">Package</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">descriptor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resources</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">licenses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sources</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">homepage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contributors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keywords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basepath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">onerror</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ignore'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trusted</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hashing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/package.html#Package"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.package.Package" title="Permalink to this definition">¶</a></dt>
+<dd><p>Package representation</p>
+<p>API      | Usage
+——– | ——–
+Public   | <cite>from frictionless import Package</cite></p>
+<p>This class is one of the cornerstones of of Frictionless framework.
+It manages underlaying resource and provides an ability to describe a package.</p>
+<p><a href="#id1"><span class="problematic" id="id2">``</span></a><a href="#id3"><span class="problematic" id="id4">`</span></a>python
+package = Package(resources=[Resource(path=”data/table.csv”)])
+package.get_resoure(‘table’).read_rows() == [</p>
+<blockquote>
+<div><p>{‘id’: 1, ‘name’: ‘english’},
+{‘id’: 2, ‘name’: ‘中国人’},</p>
+</div></blockquote>
+<p>Parameters:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>source (any): Source of the package; can be in various forms.</dt><dd><p>Usually, it’s a package descriptor in a form of dict or path
+Also, it can be a glob pattern or a resource path</p>
+</dd>
+<dt>descriptor (dict|str): A resource descriptor provided explicitly.</dt><dd><p>Keyword arguments will patch this descriptor if provided.</p>
+</dd>
+<dt>resources? (dict|Resource[]): A list of resource descriptors.</dt><dd><p>It can be dicts or Resource instances.</p>
+</dd>
+<dt>id? (str): A property reserved for globally unique identifiers.</dt><dd><p>Examples of identifiers that are unique include UUIDs and DOIs.</p>
+</dd>
+<dt>name? (str): A short url-usable (and preferably human-readable) name.</dt><dd><p>This MUST be lower-case and contain only alphanumeric characters
+along with “.”, “_” or “-” characters.</p>
+</dd>
+<dt>title? (str): A Package title according to the specs</dt><dd><p>It should a human-oriented title of the resource.</p>
+</dd>
+<dt>description? (str): A Package description according to the specs</dt><dd><p>It should a human-oriented description of the resource.</p>
+</dd>
+<dt>licenses? (dict[]): The license(s) under which the package is provided.</dt><dd><p>If omitted it’s considered the same as the package’s licenses.</p>
+</dd>
+<dt>sources? (dict[]): The raw sources for this data package.</dt><dd><p>It MUST be an array of Source objects.
+Each Source object MUST have a title and
+MAY have path and/or email properties.</p>
+</dd>
+<dt>profile? (str): A string identifying the profile of this descriptor.</dt><dd><p>For example, <cite>fiscal-data-package</cite>.</p>
+</dd>
+<dt>homepage? (str): A URL for the home on the web that is related to this package.</dt><dd><p>For example, github repository or ckan dataset address.</p>
+</dd>
+<dt>version? (str): A version string identifying the version of the package.</dt><dd><p>It should conform to the Semantic Versioning requirements and
+should follow the Data Package Version pattern.</p>
+</dd>
+<dt>contributors? (dict[]): The people or organizations who contributed to this package.</dt><dd><p>It MUST be an array. Each entry is a Contributor and MUST be an object.
+A Contributor MUST have a title property and MAY contain
+path, email, role and organization properties.</p>
+</dd>
+<dt>keywords? (str[]): An Array of string keywords to assist users searching.</dt><dd><p>For example, [‘data’, ‘fiscal’]</p>
+</dd>
+<dt>image? (str): An image to use for this data package.</dt><dd><p>For example, when showing the package in a listing.</p>
+</dd>
+<dt>created? (str): The datetime on which this was created.</dt><dd><p>The datetime must conform to the string formats for RFC3339 datetime,</p>
+</dd>
+<dt>basepath? (str): A basepath of the resource</dt><dd><p>The fullpath of the resource is joined <cite>basepath</cite> and /path`</p>
+</dd>
+<dt>detector? (Detector): File/table detector.</dt><dd><p>For more information, please check the Detector documentation.</p>
+</dd>
+<dt>onerror? (ignore|warn|raise): Behaviour if there is an error.</dt><dd><p>It defaults to ‘ignore’. The default mode will ignore all errors
+on resource level and they should be handled by the user
+being available in Header and Row objects.</p>
+</dd>
+<dt>trusted? (bool): Don’t raise an exception on unsafe paths.</dt><dd><p>A path provided as a part of the descriptor considered unsafe
+if there are path traversing or the path is absolute.
+A path provided as <cite>source</cite> or <cite>path</cite> is alway trusted.</p>
+</dd>
+<dt>hashing? (str): a hashing algorithm for resources</dt><dd><p>It defaults to ‘md5’.</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="simple">
+<dt>Raises:</dt><dd><p>FrictionlessException: raise any error that occurs during the process</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#frictionless.package.Package.basepath" title="frictionless.package.Package.basepath"><code class="xref py py-obj docutils literal notranslate"><span class="pre">basepath</span></code></a></dt><dd><p>Returns:</p>
+</dd>
+<dt><a class="reference internal" href="#frictionless.package.Package.hashing" title="frictionless.package.Package.hashing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hashing</span></code></a></dt><dd><p>Returns:</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">metadata_errors</span></code></dt><dd><p>Returns:</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">metadata_valid</span></code></dt><dd><p>Returns:</p>
+</dd>
+<dt><a class="reference internal" href="#frictionless.package.Package.onerror" title="frictionless.package.Package.onerror"><code class="xref py py-obj docutils literal notranslate"><span class="pre">onerror</span></code></a></dt><dd><p>Returns:</p>
+</dd>
+<dt><a class="reference internal" href="#frictionless.package.Package.resource_names" title="frictionless.package.Package.resource_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resource_names</span></code></a></dt><dd><p>Returns:</p>
+</dd>
+<dt><a class="reference internal" href="#frictionless.package.Package.trusted" title="frictionless.package.Package.trusted"><code class="xref py py-obj docutils literal notranslate"><span class="pre">trusted</span></code></a></dt><dd><p>Returns:</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#frictionless.package.Package.add_resource" title="frictionless.package.Package.add_resource"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_resource</span></code></a>(descriptor)</p></td>
+<td><p>Add new resource to package.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#frictionless.package.Package.expand" title="frictionless.package.Package.expand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expand</span></code></a>()</p></td>
+<td><p>Expand metadata</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#frictionless.package.Package.from_bigquery" title="frictionless.package.Package.from_bigquery"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_bigquery</span></code></a>(source, *[, dialect])</p></td>
+<td><p>Import package from Bigquery</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#frictionless.package.Package.from_ckan" title="frictionless.package.Package.from_ckan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_ckan</span></code></a>(source, *[, dialect])</p></td>
+<td><p>Import package from CKAN</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#frictionless.package.Package.from_sql" title="frictionless.package.Package.from_sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_sql</span></code></a>(source, *[, dialect])</p></td>
+<td><p>Import package from SQL</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#frictionless.package.Package.from_zip" title="frictionless.package.Package.from_zip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_zip</span></code></a>(path, **options)</p></td>
+<td><p>Create a package from ZIP</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fromkeys</span></code>(iterable[, value])</p></td>
+<td><p>Create a new dictionary with keys from iterable and values set to value.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get</span></code>(key[, default])</p></td>
+<td><p>Return the value for key if key is in the dictionary, else default.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#frictionless.package.Package.get_resource" title="frictionless.package.Package.get_resource"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_resource</span></code></a>(name)</p></td>
+<td><p>Get resource by name.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#frictionless.package.Package.has_resource" title="frictionless.package.Package.has_resource"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_resource</span></code></a>(name)</p></td>
+<td><p>Check if a resource is present</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#frictionless.package.Package.infer" title="frictionless.package.Package.infer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">infer</span></code></a>(*[, stats])</p></td>
+<td><p>Infer package’s attributes</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">items</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">keys</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">metadata_attach</span></code>(name, value)</p></td>
+<td><p>Helper method for attaching a value to  the metadata</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">metadata_extract</span></code>(descriptor)</p></td>
+<td><p>Helper method called during the metadata extraction</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#frictionless.package.Package.metadata_process" title="frictionless.package.Package.metadata_process"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metadata_process</span></code></a>()</p></td>
+<td><p>Helper method called on any metadata change</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#frictionless.package.Package.metadata_validate" title="frictionless.package.Package.metadata_validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metadata_validate</span></code></a>()</p></td>
+<td><p>Helper method called on any metadata change</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code>(k[,d])</p></td>
+<td><p>If key is not found, default is returned if given, otherwise KeyError is raised</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">popitem</span></code>(*args, **kwargs)</p></td>
+<td><p>Remove and return a (key, value) pair as a 2-tuple.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">property</span></code>([func, cache, reset, write])</p></td>
+<td><p>Create a metadata property</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#frictionless.package.Package.remove_resource" title="frictionless.package.Package.remove_resource"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_resource</span></code></a>(name)</p></td>
+<td><p>Remove resource by name.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">setdefault</span></code>(*args, **kwargs)</p></td>
+<td><p>Insert key with a value of default if key is not in the dictionary.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">setinitial</span></code>(key, value)</p></td>
+<td><p>Set an initial item in a subclass’ constructor</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#frictionless.package.Package.to_bigquery" title="frictionless.package.Package.to_bigquery"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_bigquery</span></code></a>(target, *[, dialect])</p></td>
+<td><p>Export package to Bigquery</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#frictionless.package.Package.to_ckan" title="frictionless.package.Package.to_ckan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_ckan</span></code></a>(target, *[, dialect])</p></td>
+<td><p>Export package to CKAN</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#frictionless.package.Package.to_copy" title="frictionless.package.Package.to_copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_copy</span></code></a>()</p></td>
+<td><p>Create a copy of the package</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dict</span></code>()</p></td>
+<td><p>Convert metadata to a plain dict</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code>([path, encoder_class])</p></td>
+<td><p>Save metadata as a json</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#frictionless.package.Package.to_sql" title="frictionless.package.Package.to_sql"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_sql</span></code></a>(target, *[, dialect])</p></td>
+<td><p>Export package to SQL</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_yaml</span></code>([path])</p></td>
+<td><p>Save metadata as a yaml</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#frictionless.package.Package.to_zip" title="frictionless.package.Package.to_zip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_zip</span></code></a>(path, *[, encoder_class])</p></td>
+<td><p>Save package to a zip</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>([E, ]**F)</p></td>
+<td><p>If E is present and has a .keys() method, then does:  for k in E: D[k] = E[k] If E is present and lacks a .keys() method, then does:  for k, v in E: D[k] = v In either case, this is followed by: for k in F:  D[k] = F[k]</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 64%" />
+<col style="width: 36%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>metadata_Error</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.package.Package.add_resource">
+<span class="sig-name descname"><span class="pre">add_resource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/package.html#Package.add_resource"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.package.Package.add_resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add new resource to package.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>descriptor (dict): resource descriptor</p>
+</dd>
+<dt>Returns:</dt><dd><p>Resource/None: added <cite>Resource</cite> instance or <cite>None</cite> if not added</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="frictionless.package.Package.basepath">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">basepath</span></span><a class="headerlink" href="#frictionless.package.Package.basepath" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>str: package basepath</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.package.Package.contributors">
+<span class="sig-name descname"><span class="pre">contributors</span></span><a class="headerlink" href="#frictionless.package.Package.contributors" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>dict[]?: package contributors</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.package.Package.created">
+<span class="sig-name descname"><span class="pre">created</span></span><a class="headerlink" href="#frictionless.package.Package.created" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>str?: package created</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.package.Package.description">
+<span class="sig-name descname"><span class="pre">description</span></span><a class="headerlink" href="#frictionless.package.Package.description" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>str?: package description</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.package.Package.expand">
+<span class="sig-name descname"><span class="pre">expand</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/package.html#Package.expand"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.package.Package.expand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expand metadata</p>
+<p>It will add default values to the package.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.package.Package.from_bigquery">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">from_bigquery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dialect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/package.html#Package.from_bigquery"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.package.Package.from_bigquery" title="Permalink to this definition">¶</a></dt>
+<dd><p>Import package from Bigquery</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>source (string): BigQuery <cite>Service</cite> object
+dialect (dict): BigQuery dialect</p>
+</dd>
+<dt>Returns:</dt><dd><p>Package: package</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.package.Package.from_ckan">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">from_ckan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dialect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/package.html#Package.from_ckan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.package.Package.from_ckan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Import package from CKAN</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>source (string): CKAN instance url e.g. “<a class="reference external" href="https://demo.ckan.org">https://demo.ckan.org</a>”
+dialect (dict): CKAN dialect</p>
+</dd>
+<dt>Returns:</dt><dd><p>Package: package</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.package.Package.from_sql">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">from_sql</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dialect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/package.html#Package.from_sql"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.package.Package.from_sql" title="Permalink to this definition">¶</a></dt>
+<dd><p>Import package from SQL</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>source (any): SQL connection string of engine
+dialect (dict): SQL dialect</p>
+</dd>
+<dt>Returns:</dt><dd><p>Package: package</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.package.Package.from_zip">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">from_zip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/package.html#Package.from_zip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.package.Package.from_zip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a package from ZIP</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>path(str): file path
+<a href="#id5"><span class="problematic" id="id6">**</span></a>options(dict): resouce options</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.package.Package.get_resource">
+<span class="sig-name descname"><span class="pre">get_resource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/package.html#Package.get_resource"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.package.Package.get_resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get resource by name.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>name (str): resource name</p>
+</dd>
+<dt>Raises:</dt><dd><p>FrictionlessException: if resource is not found</p>
+</dd>
+<dt>Returns:</dt><dd><p>Resource/None: <cite>Resource</cite> instance or <cite>None</cite> if not found</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.package.Package.has_resource">
+<span class="sig-name descname"><span class="pre">has_resource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/package.html#Package.has_resource"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.package.Package.has_resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if a resource is present</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>name (str): schema resource name</p>
+</dd>
+<dt>Returns:</dt><dd><p>bool: whether there is the resource</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="frictionless.package.Package.hashing">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">hashing</span></span><a class="headerlink" href="#frictionless.package.Package.hashing" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>str: package hashing</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.package.Package.homepage">
+<span class="sig-name descname"><span class="pre">homepage</span></span><a class="headerlink" href="#frictionless.package.Package.homepage" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>str?: package homepage</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.package.Package.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#frictionless.package.Package.id" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>str?: package id</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.package.Package.image">
+<span class="sig-name descname"><span class="pre">image</span></span><a class="headerlink" href="#frictionless.package.Package.image" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>str?: package image</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.package.Package.infer">
+<span class="sig-name descname"><span class="pre">infer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/package.html#Package.infer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.package.Package.infer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Infer package’s attributes</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>stats? (bool): stream files completely and infer stats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.package.Package.keywords">
+<span class="sig-name descname"><span class="pre">keywords</span></span><a class="headerlink" href="#frictionless.package.Package.keywords" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>str[]?: package keywords</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.package.Package.licenses">
+<span class="sig-name descname"><span class="pre">licenses</span></span><a class="headerlink" href="#frictionless.package.Package.licenses" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>dict?: package licenses</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.package.Package.metadata_Error">
+<span class="sig-name descname"><span class="pre">metadata_Error</span></span><a class="headerlink" href="#frictionless.package.Package.metadata_Error" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">frictionless.errors.general.PackageError</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.package.Package.metadata_process">
+<span class="sig-name descname"><span class="pre">metadata_process</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/package.html#Package.metadata_process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.package.Package.metadata_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper method called on any metadata change</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.package.Package.metadata_validate">
+<span class="sig-name descname"><span class="pre">metadata_validate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/package.html#Package.metadata_validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.package.Package.metadata_validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper method called on any metadata change</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>profile (dict): a profile to validate against of</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.package.Package.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#frictionless.package.Package.name" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>str?: package name</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="frictionless.package.Package.onerror">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">onerror</span></span><a class="headerlink" href="#frictionless.package.Package.onerror" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>ignore|warn|raise: on error bahaviour</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.package.Package.profile">
+<span class="sig-name descname"><span class="pre">profile</span></span><a class="headerlink" href="#frictionless.package.Package.profile" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>str: package profile</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.package.Package.remove_resource">
+<span class="sig-name descname"><span class="pre">remove_resource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/package.html#Package.remove_resource"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.package.Package.remove_resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove resource by name.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>name (str): resource name</p>
+</dd>
+<dt>Raises:</dt><dd><p>FrictionlessException: if resource is not found</p>
+</dd>
+<dt>Returns:</dt><dd><p>Resource/None: removed <cite>Resource</cite> instances or <cite>None</cite> if not found</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="frictionless.package.Package.resource_names">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">resource_names</span></span><a class="headerlink" href="#frictionless.package.Package.resource_names" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>str[]: package resource names</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.package.Package.resources">
+<span class="sig-name descname"><span class="pre">resources</span></span><a class="headerlink" href="#frictionless.package.Package.resources" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>Resources[]: package resource</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.package.Package.sources">
+<span class="sig-name descname"><span class="pre">sources</span></span><a class="headerlink" href="#frictionless.package.Package.sources" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>dict[]?: package sources</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.package.Package.title">
+<span class="sig-name descname"><span class="pre">title</span></span><a class="headerlink" href="#frictionless.package.Package.title" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>str?: package title</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.package.Package.to_bigquery">
+<span class="sig-name descname"><span class="pre">to_bigquery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dialect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/package.html#Package.to_bigquery"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.package.Package.to_bigquery" title="Permalink to this definition">¶</a></dt>
+<dd><p>Export package to Bigquery</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>target (string): BigQuery <cite>Service</cite> object
+dialect (dict): BigQuery dialect</p>
+</dd>
+<dt>Returns:</dt><dd><p>BigqueryStorage: storage</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.package.Package.to_ckan">
+<span class="sig-name descname"><span class="pre">to_ckan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dialect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/package.html#Package.to_ckan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.package.Package.to_ckan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Export package to CKAN</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>target (string): CKAN instance url e.g. “<a class="reference external" href="https://demo.ckan.org">https://demo.ckan.org</a>”
+dialect (dict): CKAN dialect</p>
+</dd>
+<dt>Returns:</dt><dd><p>CkanStorage: storage</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.package.Package.to_copy">
+<span class="sig-name descname"><span class="pre">to_copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/package.html#Package.to_copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.package.Package.to_copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a copy of the package</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.package.Package.to_sql">
+<span class="sig-name descname"><span class="pre">to_sql</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dialect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/package.html#Package.to_sql"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.package.Package.to_sql" title="Permalink to this definition">¶</a></dt>
+<dd><p>Export package to SQL</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>target (any): SQL connection string of engine
+dialect (dict): SQL dialect</p>
+</dd>
+<dt>Returns:</dt><dd><p>SqlStorage: storage</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.package.Package.to_zip">
+<span class="sig-name descname"><span class="pre">to_zip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/package.html#Package.to_zip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.package.Package.to_zip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save package to a zip</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>path (str): target path
+encoder_class (object): json encoder class</p>
+</dd>
+<dt>Raises:</dt><dd><p>FrictionlessException: on any error</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="frictionless.package.Package.trusted">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">trusted</span></span><a class="headerlink" href="#frictionless.package.Package.trusted" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>str: package trusted</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.package.Package.version">
+<span class="sig-name descname"><span class="pre">version</span></span><a class="headerlink" href="#frictionless.package.Package.version" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>str?: package version</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-frictionless.resource">
+<span id="resource"></span><h1>Resource<a class="headerlink" href="#module-frictionless.resource" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="frictionless.resource.Resource">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">frictionless.resource.</span></span><span class="sig-name descname"><span class="pre">Resource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">descriptor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mediatype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">licenses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sources</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scheme</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hashing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">innerpath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compression</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">control</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dialect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basepath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">onerror</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ignore'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trusted</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/resource.html#Resource"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.resource.Resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resource representation.</p>
+<p>API      | Usage
+——– | ——–
+Public   | <cite>from frictionless import Resource</cite></p>
+<p>This class is one of the cornerstones of of Frictionless framework.
+It loads a data source, and allows you to stream its parsed contents.
+At the same time, it’s a metadata class data description.</p>
+<p><a href="#id7"><span class="problematic" id="id8">``</span></a><a href="#id9"><span class="problematic" id="id10">`</span></a>python
+with Resource(“data/table.csv”) as resource:</p>
+<blockquote>
+<div><p>resource.header == [“id”, “name”]
+resource.read_rows() == [</p>
+<blockquote>
+<div><p>{‘id’: 1, ‘name’: ‘english’},
+{‘id’: 2, ‘name’: ‘中国人’},</p>
+</div></blockquote>
+<p>]</p>
+</div></blockquote>
+<p><a href="#id11"><span class="problematic" id="id12">``</span></a><a href="#id13"><span class="problematic" id="id14">`</span></a></p>
+<p>Parameters:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>source (any): Source of the resource; can be in various forms.</dt><dd><p>Usually, it’s a string as <cite>&lt;scheme&gt;://path/to/file.&lt;format&gt;</cite>.
+It also can be, for example, an array of data arrays/dictionaries.
+Or it can be a resource descriptor dict or path.</p>
+</dd>
+<dt>descriptor (dict|str): A resource descriptor provided explicitly.</dt><dd><p>Keyword arguments will patch this descriptor if provided.</p>
+</dd>
+<dt>name? (str): A Resource name according to the specs.</dt><dd><p>It should be a slugified name of the resource.</p>
+</dd>
+<dt>title? (str): A Resource title according to the specs</dt><dd><p>It should a human-oriented title of the resource.</p>
+</dd>
+<dt>description? (str): A Resource description according to the specs</dt><dd><p>It should a human-oriented description of the resource.</p>
+</dd>
+<dt>mediatype? (str): A mediatype/mimetype of the resource e.g. “text/csv”,</dt><dd><p>or “application/vnd.ms-excel”.  Mediatypes are maintained by the
+Internet Assigned Numbers Authority (IANA) in a media type registry.</p>
+</dd>
+<dt>licenses? (dict[]): The license(s) under which the resource is provided.</dt><dd><p>If omitted it’s considered the same as the package’s licenses.</p>
+</dd>
+<dt>sources? (dict[]): The raw sources for this data resource.</dt><dd><p>It MUST be an array of Source objects.
+Each Source object MUST have a title and
+MAY have path and/or email properties.</p>
+</dd>
+<dt>profile? (str): A string identifying the profile of this descriptor.</dt><dd><p>For example, <cite>tabular-data-resource</cite>.</p>
+</dd>
+<dt>scheme? (str): Scheme for loading the file (file, http, …).</dt><dd><p>If not set, it’ll be inferred from <cite>source</cite>.</p>
+</dd>
+<dt>format? (str): File source’s format (csv, xls, …).</dt><dd><p>If not set, it’ll be inferred from <cite>source</cite>.</p>
+</dd>
+<dt>hashing? (str): An algorithm to hash data.</dt><dd><p>It defaults to ‘md5’.</p>
+</dd>
+<dt>encoding? (str): Source encoding.</dt><dd><p>If not set, it’ll be inferred from <cite>source</cite>.</p>
+</dd>
+<dt>innerpath? (str): A path within the compressed file.</dt><dd><p>It defaults to the first file in the archive.</p>
+</dd>
+<dt>compression? (str): Source file compression (zip, …).</dt><dd><p>If not set, it’ll be inferred from <cite>source</cite>.</p>
+</dd>
+<dt>control? (dict|Control): File control.</dt><dd><p>For more information, please check the Control documentation.</p>
+</dd>
+<dt>dialect? (dict|Dialect): Table dialect.</dt><dd><p>For more information, please check the Dialect documentation.</p>
+</dd>
+<dt>layout? (dict|Layout): Table layout.</dt><dd><p>For more information, please check the Layout documentation.</p>
+</dd>
+<dt>schema? (dict|Schema): Table schema.</dt><dd><p>For more information, please check the Schema documentation.</p>
+</dd>
+<dt>stats? (dict): File/table stats.</dt><dd><p>A dict with the following possible properties: hash, bytes, fields, rows.</p>
+</dd>
+<dt>basepath? (str): A basepath of the resource</dt><dd><p>The fullpath of the resource is joined <cite>basepath</cite> and /path`</p>
+</dd>
+<dt>detector? (Detector): File/table detector.</dt><dd><p>For more information, please check the Detector documentation.</p>
+</dd>
+<dt>onerror? (ignore|warn|raise): Behaviour if there is an error.</dt><dd><p>It defaults to ‘ignore’. The default mode will ignore all errors
+on resource level and they should be handled by the user
+being available in Header and Row objects.</p>
+</dd>
+<dt>trusted? (bool): Don’t raise an exception on unsafe paths.</dt><dd><p>A path provided as a part of the descriptor considered unsafe
+if there are path traversing or the path is absolute.
+A path provided as <cite>source</cite> or <cite>path</cite> is alway trusted.</p>
+</dd>
+<dt>package? (Package): A owning this resource package.</dt><dd><p>It’s actual if the resource is part of some data package.</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="simple">
+<dt>Raises:</dt><dd><p>FrictionlessException: raise any error that occurs during the process</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#frictionless.resource.Resource.basepath" title="frictionless.resource.Resource.basepath"><code class="xref py py-obj docutils literal notranslate"><span class="pre">basepath</span></code></a></dt><dd><p>Returns</p>
+</dd>
+<dt><a class="reference internal" href="#frictionless.resource.Resource.buffer" title="frictionless.resource.Resource.buffer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">buffer</span></code></a></dt><dd><p>File’s bytes used as a sample</p>
+</dd>
+<dt><a class="reference internal" href="#frictionless.resource.Resource.byte_stream" title="frictionless.resource.Resource.byte_stream"><code class="xref py py-obj docutils literal notranslate"><span class="pre">byte_stream</span></code></a></dt><dd><p>Byte stream in form of a generator</p>
+</dd>
+<dt><a class="reference internal" href="#frictionless.resource.Resource.closed" title="frictionless.resource.Resource.closed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">closed</span></code></a></dt><dd><p>Whether the table is closed</p>
+</dd>
+<dt><a class="reference internal" href="#frictionless.resource.Resource.detector" title="frictionless.resource.Resource.detector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">detector</span></code></a></dt><dd><p>Returns</p>
+</dd>
+<dt><a class="reference internal" href="#frictionless.resource.Resource.fragment" title="frictionless.resource.Resource.fragment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fragment</span></code></a></dt><dd><p>Table’s lists used as fragment.</p>
+</dd>
+<dt><a class="reference internal" href="#frictionless.resource.Resource.fullpath" title="frictionless.resource.Resource.fullpath"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fullpath</span></code></a></dt><dd><p>Returns</p>
+</dd>
+<dt><a class="reference internal" href="#frictionless.resource.Resource.header" title="frictionless.resource.Resource.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a></dt><dd><p>Returns:</p>
+</dd>
+<dt><a class="reference internal" href="#frictionless.resource.Resource.labels" title="frictionless.resource.Resource.labels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">labels</span></code></a></dt><dd><p>Returns:</p>
+</dd>
+<dt><a class="reference internal" href="#frictionless.resource.Resource.list_stream" title="frictionless.resource.Resource.list_stream"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_stream</span></code></a></dt><dd><p>List stream in form of a generator</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">metadata_errors</span></code></dt><dd><p>Returns:</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">metadata_valid</span></code></dt><dd><p>Returns:</p>
+</dd>
+<dt><a class="reference internal" href="#frictionless.resource.Resource.onerror" title="frictionless.resource.Resource.onerror"><code class="xref py py-obj docutils literal notranslate"><span class="pre">onerror</span></code></a></dt><dd><p>Returns:</p>
+</dd>
+<dt><a class="reference internal" href="#frictionless.resource.Resource.package" title="frictionless.resource.Resource.package"><code class="xref py py-obj docutils literal notranslate"><span class="pre">package</span></code></a></dt><dd><p>Returns:</p>
+</dd>
+<dt><a class="reference internal" href="#frictionless.resource.Resource.row_stream" title="frictionless.resource.Resource.row_stream"><code class="xref py py-obj docutils literal notranslate"><span class="pre">row_stream</span></code></a></dt><dd><p>Row stream in form of a generator of Row objects</p>
+</dd>
+<dt><a class="reference internal" href="#frictionless.resource.Resource.sample" title="frictionless.resource.Resource.sample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample</span></code></a></dt><dd><p>Table’s lists used as sample.</p>
+</dd>
+<dt><a class="reference internal" href="#frictionless.resource.Resource.text_stream" title="frictionless.resource.Resource.text_stream"><code class="xref py py-obj docutils literal notranslate"><span class="pre">text_stream</span></code></a></dt><dd><p>Text stream in form of a generator</p>
+</dd>
+<dt><a class="reference internal" href="#frictionless.resource.Resource.trusted" title="frictionless.resource.Resource.trusted"><code class="xref py py-obj docutils literal notranslate"><span class="pre">trusted</span></code></a></dt><dd><p>Returns:</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#frictionless.resource.Resource.close" title="frictionless.resource.Resource.close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">close</span></code></a>()</p></td>
+<td><p>Close the table as “filelike.close” does</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#frictionless.resource.Resource.expand" title="frictionless.resource.Resource.expand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expand</span></code></a>()</p></td>
+<td><p>Expand metadata</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#frictionless.resource.Resource.from_petl" title="frictionless.resource.Resource.from_petl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_petl</span></code></a>(view, **options)</p></td>
+<td><p>Create a resource from PETL view</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fromkeys</span></code>(iterable[, value])</p></td>
+<td><p>Create a new dictionary with keys from iterable and values set to value.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get</span></code>(key[, default])</p></td>
+<td><p>Return the value for key if key is in the dictionary, else default.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#frictionless.resource.Resource.infer" title="frictionless.resource.Resource.infer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">infer</span></code></a>(*[, stats])</p></td>
+<td><p>Infer metadata</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">items</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">keys</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">metadata_attach</span></code>(name, value)</p></td>
+<td><p>Helper method for attaching a value to  the metadata</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">metadata_extract</span></code>(descriptor)</p></td>
+<td><p>Helper method called during the metadata extraction</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#frictionless.resource.Resource.metadata_process" title="frictionless.resource.Resource.metadata_process"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metadata_process</span></code></a>()</p></td>
+<td><p>Helper method called on any metadata change</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#frictionless.resource.Resource.metadata_validate" title="frictionless.resource.Resource.metadata_validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metadata_validate</span></code></a>()</p></td>
+<td><p>Helper method called on any metadata change</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#frictionless.resource.Resource.open" title="frictionless.resource.Resource.open"><code class="xref py py-obj docutils literal notranslate"><span class="pre">open</span></code></a>()</p></td>
+<td><p>Open the resource as “io.open” does</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code>(k[,d])</p></td>
+<td><p>If key is not found, default is returned if given, otherwise KeyError is raised</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">popitem</span></code>(*args, **kwargs)</p></td>
+<td><p>Remove and return a (key, value) pair as a 2-tuple.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">property</span></code>([func, cache, reset, write])</p></td>
+<td><p>Create a metadata property</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#frictionless.resource.Resource.read_bytes" title="frictionless.resource.Resource.read_bytes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_bytes</span></code></a>(*[, size])</p></td>
+<td><p>Read bytes into memory</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#frictionless.resource.Resource.read_data" title="frictionless.resource.Resource.read_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_data</span></code></a>(*[, size])</p></td>
+<td><p>Read data into memory</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#frictionless.resource.Resource.read_lists" title="frictionless.resource.Resource.read_lists"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_lists</span></code></a>(*[, size])</p></td>
+<td><p>Read lists into memory</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#frictionless.resource.Resource.read_rows" title="frictionless.resource.Resource.read_rows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_rows</span></code></a>(*[, size])</p></td>
+<td><p>Read rows into memory</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#frictionless.resource.Resource.read_text" title="frictionless.resource.Resource.read_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_text</span></code></a>(*[, size])</p></td>
+<td><p>Read text into memory</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">setdefault</span></code>(*args, **kwargs)</p></td>
+<td><p>Insert key with a value of default if key is not in the dictionary.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">setinitial</span></code>(key, value)</p></td>
+<td><p>Set an initial item in a subclass’ constructor</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#frictionless.resource.Resource.to_copy" title="frictionless.resource.Resource.to_copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_copy</span></code></a>(**options)</p></td>
+<td><p>Create a copy of the resource</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#frictionless.resource.Resource.to_dict" title="frictionless.resource.Resource.to_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dict</span></code></a>()</p></td>
+<td><p>Convert metadata to a plain dict</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#frictionless.resource.Resource.to_inline" title="frictionless.resource.Resource.to_inline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_inline</span></code></a>(*[, dialect])</p></td>
+<td><p>Helper to export resource as an inline data</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code>([path, encoder_class])</p></td>
+<td><p>Save metadata as a json</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#frictionless.resource.Resource.to_pandas" title="frictionless.resource.Resource.to_pandas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_pandas</span></code></a>(*[, dialect])</p></td>
+<td><p>Helper to export resource as an Pandas dataframe</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#frictionless.resource.Resource.to_petl" title="frictionless.resource.Resource.to_petl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_petl</span></code></a>()</p></td>
+<td><p>Export resource as a PETL view</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_yaml</span></code>([path])</p></td>
+<td><p>Save metadata as a yaml</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>([E, ]**F)</p></td>
+<td><p>If E is present and has a .keys() method, then does:  for k in E: D[k] = E[k] If E is present and lacks a .keys() method, then does:  for k, v in E: D[k] = v In either case, this is followed by: for k in F:  D[k] = F[k]</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#frictionless.resource.Resource.write" title="frictionless.resource.Resource.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code></a>([target])</p></td>
+<td><p>Write this resource to the target resource</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 64%" />
+<col style="width: 36%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>metadata_Error</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>to_snapshot</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py property">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.basepath">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">basepath</span></span><a class="headerlink" href="#frictionless.resource.Resource.basepath" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns</dt><dd><p>str: resource basepath</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.buffer">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">buffer</span></span><a class="headerlink" href="#frictionless.resource.Resource.buffer" title="Permalink to this definition">¶</a></dt>
+<dd><p>File’s bytes used as a sample</p>
+<p>These buffer bytes are used to infer characteristics of the
+source file (e.g. encoding, …).</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>bytes?: file buffer</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.byte_stream">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">byte_stream</span></span><a class="headerlink" href="#frictionless.resource.Resource.byte_stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Byte stream in form of a generator</p>
+<dl class="simple">
+<dt>Yields:</dt><dd><p>gen&lt;bytes&gt;?: byte stream</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/resource.html#Resource.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.resource.Resource.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the table as “filelike.close” does</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.closed">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">closed</span></span><a class="headerlink" href="#frictionless.resource.Resource.closed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether the table is closed</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>bool: if closed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.compression">
+<span class="sig-name descname"><span class="pre">compression</span></span><a class="headerlink" href="#frictionless.resource.Resource.compression" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns</dt><dd><p>str?: resource compression</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.control">
+<span class="sig-name descname"><span class="pre">control</span></span><a class="headerlink" href="#frictionless.resource.Resource.control" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns</dt><dd><p>Control?: resource control</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.data">
+<span class="sig-name descname"><span class="pre">data</span></span><a class="headerlink" href="#frictionless.resource.Resource.data" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns</dt><dd><p>any[][]?: resource data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.description">
+<span class="sig-name descname"><span class="pre">description</span></span><a class="headerlink" href="#frictionless.resource.Resource.description" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns</dt><dd><p>str: resource description</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.detector">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">detector</span></span><a class="headerlink" href="#frictionless.resource.Resource.detector" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns</dt><dd><p>str: resource detector</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.dialect">
+<span class="sig-name descname"><span class="pre">dialect</span></span><a class="headerlink" href="#frictionless.resource.Resource.dialect" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns</dt><dd><p>Dialect?: resource dialect</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.encoding">
+<span class="sig-name descname"><span class="pre">encoding</span></span><a class="headerlink" href="#frictionless.resource.Resource.encoding" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns</dt><dd><p>str?: resource encoding</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.expand">
+<span class="sig-name descname"><span class="pre">expand</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/resource.html#Resource.expand"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.resource.Resource.expand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expand metadata</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.format">
+<span class="sig-name descname"><span class="pre">format</span></span><a class="headerlink" href="#frictionless.resource.Resource.format" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns</dt><dd><p>str?: resource format</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.fragment">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">fragment</span></span><a class="headerlink" href="#frictionless.resource.Resource.fragment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Table’s lists used as fragment.</p>
+<p>These fragment rows are used internally to infer characteristics of the
+source file (e.g. schema, …).</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>list[]?: table fragment</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.from_petl">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">from_petl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">view</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/resource.html#Resource.from_petl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.resource.Resource.from_petl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a resource from PETL view</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.fullpath">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">fullpath</span></span><a class="headerlink" href="#frictionless.resource.Resource.fullpath" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns</dt><dd><p>str: resource fullpath</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.hashing">
+<span class="sig-name descname"><span class="pre">hashing</span></span><a class="headerlink" href="#frictionless.resource.Resource.hashing" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns</dt><dd><p>str?: resource hashing</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.header">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">header</span></span><a class="headerlink" href="#frictionless.resource.Resource.header" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>str[]?: table header</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.infer">
+<span class="sig-name descname"><span class="pre">infer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/resource.html#Resource.infer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.resource.Resource.infer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Infer metadata</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>stats? (bool): stream file completely and infer stats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.innerpath">
+<span class="sig-name descname"><span class="pre">innerpath</span></span><a class="headerlink" href="#frictionless.resource.Resource.innerpath" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns</dt><dd><p>str?: resource compression path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.labels">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">labels</span></span><a class="headerlink" href="#frictionless.resource.Resource.labels" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>str[]?: table labels</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.layout">
+<span class="sig-name descname"><span class="pre">layout</span></span><a class="headerlink" href="#frictionless.resource.Resource.layout" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>Layout?: table layout</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.licenses">
+<span class="sig-name descname"><span class="pre">licenses</span></span><a class="headerlink" href="#frictionless.resource.Resource.licenses" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns</dt><dd><p>dict[]: resource licenses</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.list_stream">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">list_stream</span></span><a class="headerlink" href="#frictionless.resource.Resource.list_stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>List stream in form of a generator</p>
+<dl class="simple">
+<dt>Yields:</dt><dd><p>gen&lt;any[][]&gt;?: list stream</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.mediatype">
+<span class="sig-name descname"><span class="pre">mediatype</span></span><a class="headerlink" href="#frictionless.resource.Resource.mediatype" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns</dt><dd><p>str: resource mediatype</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.metadata_Error">
+<span class="sig-name descname"><span class="pre">metadata_Error</span></span><a class="headerlink" href="#frictionless.resource.Resource.metadata_Error" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">frictionless.errors.general.ResourceError</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.metadata_process">
+<span class="sig-name descname"><span class="pre">metadata_process</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/resource.html#Resource.metadata_process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.resource.Resource.metadata_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper method called on any metadata change</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.metadata_validate">
+<span class="sig-name descname"><span class="pre">metadata_validate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/resource.html#Resource.metadata_validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.resource.Resource.metadata_validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper method called on any metadata change</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>profile (dict): a profile to validate against of</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#frictionless.resource.Resource.name" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns</dt><dd><p>str: resource name</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.onerror">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">onerror</span></span><a class="headerlink" href="#frictionless.resource.Resource.onerror" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>ignore|warn|raise: on error bahaviour</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.open">
+<span class="sig-name descname"><span class="pre">open</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/resource.html#Resource.open"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.resource.Resource.open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open the resource as “io.open” does</p>
+<dl class="simple">
+<dt>Raises:</dt><dd><p>FrictionlessException: any exception that occurs</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.package">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">package</span></span><a class="headerlink" href="#frictionless.resource.Resource.package" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>Package?: parent package</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.path">
+<span class="sig-name descname"><span class="pre">path</span></span><a class="headerlink" href="#frictionless.resource.Resource.path" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns</dt><dd><p>str?: resource path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.profile">
+<span class="sig-name descname"><span class="pre">profile</span></span><a class="headerlink" href="#frictionless.resource.Resource.profile" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns</dt><dd><p>str?: resource profile</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.read_bytes">
+<span class="sig-name descname"><span class="pre">read_bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/resource.html#Resource.read_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.resource.Resource.read_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read bytes into memory</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>any[][]: resource bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.read_data">
+<span class="sig-name descname"><span class="pre">read_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/resource.html#Resource.read_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.resource.Resource.read_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read data into memory</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>any: resource data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.read_lists">
+<span class="sig-name descname"><span class="pre">read_lists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/resource.html#Resource.read_lists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.resource.Resource.read_lists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read lists into memory</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>any[][]: table lists</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.read_rows">
+<span class="sig-name descname"><span class="pre">read_rows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/resource.html#Resource.read_rows"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.resource.Resource.read_rows" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read rows into memory</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>Row[]: table rows</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.read_text">
+<span class="sig-name descname"><span class="pre">read_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/resource.html#Resource.read_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.resource.Resource.read_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read text into memory</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: resource text</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.row_stream">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">row_stream</span></span><a class="headerlink" href="#frictionless.resource.Resource.row_stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Row stream in form of a generator of Row objects</p>
+<dl class="simple">
+<dt>Yields:</dt><dd><p>gen&lt;Row[]&gt;?: row stream</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.sample">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">sample</span></span><a class="headerlink" href="#frictionless.resource.Resource.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Table’s lists used as sample.</p>
+<p>These sample rows are used to infer characteristics of the
+source file (e.g. schema, …).</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>list[]?: table sample</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.schema">
+<span class="sig-name descname"><span class="pre">schema</span></span><a class="headerlink" href="#frictionless.resource.Resource.schema" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns</dt><dd><p>Schema: resource schema</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.scheme">
+<span class="sig-name descname"><span class="pre">scheme</span></span><a class="headerlink" href="#frictionless.resource.Resource.scheme" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns</dt><dd><p>str?: resource scheme</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.sources">
+<span class="sig-name descname"><span class="pre">sources</span></span><a class="headerlink" href="#frictionless.resource.Resource.sources" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns</dt><dd><p>dict[]: resource sources</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.stats">
+<span class="sig-name descname"><span class="pre">stats</span></span><a class="headerlink" href="#frictionless.resource.Resource.stats" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns</dt><dd><p>dict?: resource stats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.tabular">
+<span class="sig-name descname"><span class="pre">tabular</span></span><a class="headerlink" href="#frictionless.resource.Resource.tabular" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns</dt><dd><p>bool: if resource is tabular</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.text_stream">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">text_stream</span></span><a class="headerlink" href="#frictionless.resource.Resource.text_stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Text stream in form of a generator</p>
+<dl class="simple">
+<dt>Yields:</dt><dd><p>gen&lt;str[]&gt;?: text stream</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.title">
+<span class="sig-name descname"><span class="pre">title</span></span><a class="headerlink" href="#frictionless.resource.Resource.title" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns</dt><dd><p>str: resource title</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.to_copy">
+<span class="sig-name descname"><span class="pre">to_copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/resource.html#Resource.to_copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.resource.Resource.to_copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a copy of the resource</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/resource.html#Resource.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.resource.Resource.to_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert metadata to a plain dict</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>dict: metadata as a plain dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.to_inline">
+<span class="sig-name descname"><span class="pre">to_inline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dialect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/resource.html#Resource.to_inline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.resource.Resource.to_inline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper to export resource as an inline data</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.to_pandas">
+<span class="sig-name descname"><span class="pre">to_pandas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dialect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/resource.html#Resource.to_pandas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.resource.Resource.to_pandas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper to export resource as an Pandas dataframe</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.to_petl">
+<span class="sig-name descname"><span class="pre">to_petl</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/resource.html#Resource.to_petl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.resource.Resource.to_petl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Export resource as a PETL view</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.trusted">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">trusted</span></span><a class="headerlink" href="#frictionless.resource.Resource.trusted" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>bool: don’t raise an exception on unsafe paths</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="frictionless.resource.Resource.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/frictionless/resource.html#Resource.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#frictionless.resource.Resource.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write this resource to the target resource</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>target (any|Resource): target or target resource instance
+<a href="#id15"><span class="problematic" id="id16">**</span></a>options (dict): Resource constructor options</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../devnotes.html" class="btn btn-neutral float-right" title="Notes for developers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="api.html" class="btn btn-neutral float-left" title="Datapackage tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, SENTINEL Project.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

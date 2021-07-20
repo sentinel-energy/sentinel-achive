@@ -1,0 +1,878 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>frictionless.package &mdash; friendly_data 0.2.2.dev documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> friendly_data
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hands-on.html">Hands-on tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../registry.html">Data registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced.html">Advanced use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../devnotes.html">Notes for developers</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">friendly_data</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>frictionless.package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for frictionless.package</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">.exception</span> <span class="kn">import</span> <span class="n">FrictionlessException</span>
+<span class="kn">from</span> <span class="nn">.metadata</span> <span class="kn">import</span> <span class="n">Metadata</span>
+<span class="kn">from</span> <span class="nn">.detector</span> <span class="kn">import</span> <span class="n">Detector</span>
+<span class="kn">from</span> <span class="nn">.resource</span> <span class="kn">import</span> <span class="n">Resource</span>
+<span class="kn">from</span> <span class="nn">.system</span> <span class="kn">import</span> <span class="n">system</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">helpers</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">errors</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">config</span>
+
+
+<div class="viewcode-block" id="Package"><a class="viewcode-back" href="../../api/external.html#frictionless.package.Package">[docs]</a><span class="k">class</span> <span class="nc">Package</span><span class="p">(</span><span class="n">Metadata</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Package representation</span>
+
+<span class="sd">    API      | Usage</span>
+<span class="sd">    -------- | --------</span>
+<span class="sd">    Public   | `from frictionless import Package`</span>
+
+<span class="sd">    This class is one of the cornerstones of of Frictionless framework.</span>
+<span class="sd">    It manages underlaying resource and provides an ability to describe a package.</span>
+
+<span class="sd">    ```python</span>
+<span class="sd">    package = Package(resources=[Resource(path=&quot;data/table.csv&quot;)])</span>
+<span class="sd">    package.get_resoure(&#39;table&#39;).read_rows() == [</span>
+<span class="sd">        {&#39;id&#39;: 1, &#39;name&#39;: &#39;english&#39;},</span>
+<span class="sd">        {&#39;id&#39;: 2, &#39;name&#39;: &#39;中国人&#39;},</span>
+<span class="sd">    ]</span>
+<span class="sd">    ```</span>
+
+<span class="sd">    Parameters:</span>
+
+<span class="sd">        source (any): Source of the package; can be in various forms.</span>
+<span class="sd">            Usually, it&#39;s a package descriptor in a form of dict or path</span>
+<span class="sd">            Also, it can be a glob pattern or a resource path</span>
+
+<span class="sd">        descriptor (dict|str): A resource descriptor provided explicitly.</span>
+<span class="sd">            Keyword arguments will patch this descriptor if provided.</span>
+
+<span class="sd">        resources? (dict|Resource[]): A list of resource descriptors.</span>
+<span class="sd">            It can be dicts or Resource instances.</span>
+
+<span class="sd">        id? (str): A property reserved for globally unique identifiers.</span>
+<span class="sd">            Examples of identifiers that are unique include UUIDs and DOIs.</span>
+
+<span class="sd">        name? (str): A short url-usable (and preferably human-readable) name.</span>
+<span class="sd">            This MUST be lower-case and contain only alphanumeric characters</span>
+<span class="sd">            along with “.”, “_” or “-” characters.</span>
+
+<span class="sd">        title? (str): A Package title according to the specs</span>
+<span class="sd">           It should a human-oriented title of the resource.</span>
+
+<span class="sd">        description? (str): A Package description according to the specs</span>
+<span class="sd">           It should a human-oriented description of the resource.</span>
+
+<span class="sd">        licenses? (dict[]): The license(s) under which the package is provided.</span>
+<span class="sd">            If omitted it&#39;s considered the same as the package&#39;s licenses.</span>
+
+<span class="sd">        sources? (dict[]): The raw sources for this data package.</span>
+<span class="sd">            It MUST be an array of Source objects.</span>
+<span class="sd">            Each Source object MUST have a title and</span>
+<span class="sd">            MAY have path and/or email properties.</span>
+
+<span class="sd">        profile? (str): A string identifying the profile of this descriptor.</span>
+<span class="sd">            For example, `fiscal-data-package`.</span>
+
+<span class="sd">        homepage? (str): A URL for the home on the web that is related to this package.</span>
+<span class="sd">            For example, github repository or ckan dataset address.</span>
+
+<span class="sd">        version? (str): A version string identifying the version of the package.</span>
+<span class="sd">            It should conform to the Semantic Versioning requirements and</span>
+<span class="sd">            should follow the Data Package Version pattern.</span>
+
+<span class="sd">        contributors? (dict[]): The people or organizations who contributed to this package.</span>
+<span class="sd">            It MUST be an array. Each entry is a Contributor and MUST be an object.</span>
+<span class="sd">            A Contributor MUST have a title property and MAY contain</span>
+<span class="sd">            path, email, role and organization properties.</span>
+
+<span class="sd">        keywords? (str[]): An Array of string keywords to assist users searching.</span>
+<span class="sd">            For example, [&#39;data&#39;, &#39;fiscal&#39;]</span>
+
+<span class="sd">        image? (str): An image to use for this data package.</span>
+<span class="sd">            For example, when showing the package in a listing.</span>
+
+<span class="sd">        created? (str): The datetime on which this was created.</span>
+<span class="sd">            The datetime must conform to the string formats for RFC3339 datetime,</span>
+
+<span class="sd">        basepath? (str): A basepath of the resource</span>
+<span class="sd">            The fullpath of the resource is joined `basepath` and /path`</span>
+
+<span class="sd">        detector? (Detector): File/table detector.</span>
+<span class="sd">            For more information, please check the Detector documentation.</span>
+
+<span class="sd">        onerror? (ignore|warn|raise): Behaviour if there is an error.</span>
+<span class="sd">            It defaults to &#39;ignore&#39;. The default mode will ignore all errors</span>
+<span class="sd">            on resource level and they should be handled by the user</span>
+<span class="sd">            being available in Header and Row objects.</span>
+
+<span class="sd">        trusted? (bool): Don&#39;t raise an exception on unsafe paths.</span>
+<span class="sd">            A path provided as a part of the descriptor considered unsafe</span>
+<span class="sd">            if there are path traversing or the path is absolute.</span>
+<span class="sd">            A path provided as `source` or `path` is alway trusted.</span>
+
+<span class="sd">        hashing? (str): a hashing algorithm for resources</span>
+<span class="sd">            It defaults to &#39;md5&#39;.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        FrictionlessException: raise any error that occurs during the process</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">descriptor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="c1"># Spec</span>
+        <span class="n">resources</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">licenses</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">sources</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">profile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">homepage</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">contributors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">keywords</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">created</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="c1"># Extra</span>
+        <span class="n">basepath</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">detector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">onerror</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span>
+        <span class="n">trusted</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">hashing</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+
+        <span class="c1"># Handle source</span>
+        <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">descriptor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">descriptor</span> <span class="o">=</span> <span class="n">source</span>
+                <span class="n">file</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">basepath</span><span class="o">=</span><span class="n">basepath</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">multipart</span><span class="p">:</span>
+                    <span class="n">descriptor</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;resources&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+                    <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">file</span><span class="o">.</span><span class="n">normpath</span><span class="p">:</span>
+                        <span class="n">descriptor</span><span class="p">[</span><span class="s2">&quot;resources&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">part</span><span class="p">})</span>
+                <span class="k">elif</span> <span class="n">file</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;table&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">file</span><span class="o">.</span><span class="n">compression</span><span class="p">:</span>
+                    <span class="n">descriptor</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;resources&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">file</span><span class="o">.</span><span class="n">normpath</span><span class="p">}]}</span>
+
+        <span class="c1"># Handle pathlib</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">descriptor</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+            <span class="n">descriptor</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">descriptor</span><span class="p">)</span>
+
+        <span class="c1"># Handle trusted</span>
+        <span class="k">if</span> <span class="n">descriptor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">trusted</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Handle zip</span>
+        <span class="k">if</span> <span class="n">helpers</span><span class="o">.</span><span class="n">is_zip_descriptor</span><span class="p">(</span><span class="n">descriptor</span><span class="p">):</span>
+            <span class="n">descriptor</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">unzip_descriptor</span><span class="p">(</span><span class="n">descriptor</span><span class="p">,</span> <span class="s2">&quot;datapackage.json&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Set attributes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;resources&quot;</span><span class="p">,</span> <span class="n">resources</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;licenses&quot;</span><span class="p">,</span> <span class="n">licenses</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;profile&quot;</span><span class="p">,</span> <span class="n">profile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;homepage&quot;</span><span class="p">,</span> <span class="n">homepage</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;version&quot;</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;sources&quot;</span><span class="p">,</span> <span class="n">sources</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;contributors&quot;</span><span class="p">,</span> <span class="n">contributors</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;keywords&quot;</span><span class="p">,</span> <span class="n">keywords</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setinitial</span><span class="p">(</span><span class="s2">&quot;created&quot;</span><span class="p">,</span> <span class="n">created</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__basepath</span> <span class="o">=</span> <span class="n">basepath</span> <span class="ow">or</span> <span class="n">helpers</span><span class="o">.</span><span class="n">parse_basepath</span><span class="p">(</span><span class="n">descriptor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__detector</span> <span class="o">=</span> <span class="n">detector</span> <span class="ow">or</span> <span class="n">Detector</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__onerror</span> <span class="o">=</span> <span class="n">onerror</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__trusted</span> <span class="o">=</span> <span class="n">trusted</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__hashing</span> <span class="o">=</span> <span class="n">hashing</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">descriptor</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;hashing&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__hashing</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;basepath&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__basepath</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;onerror&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__onerror</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;trusted&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__trusted</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata_process</span><span class="p">()</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str?: package name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str?: package id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">licenses</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            dict?: package licenses</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;licenses&quot;</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">profile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: package profile</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;profile&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">DEFAULT_PACKAGE_PROFILE</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">title</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str?: package title</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">description</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str?: package description</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">homepage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str?: package homepage</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;homepage&quot;</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str?: package version</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;version&quot;</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">sources</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            dict[]?: package sources</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sources&quot;</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">contributors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            dict[]?: package contributors</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;contributors&quot;</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">keywords</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str[]?: package keywords</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;keywords&quot;</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">image</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str?: package image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;image&quot;</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">created</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str?: package created</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;created&quot;</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">write</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">hashing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: package hashing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__hashing</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">write</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">basepath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: package basepath</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__basepath</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">write</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">onerror</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            ignore|warn|raise: on error bahaviour</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__onerror</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">write</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">trusted</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: package trusted</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__trusted</span>
+
+    <span class="c1"># Resources</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span>
+    <span class="k">def</span> <span class="nf">resources</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Resources[]: package resource</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">resources</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;resources&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_attach</span><span class="p">(</span><span class="s2">&quot;resources&quot;</span><span class="p">,</span> <span class="n">resources</span><span class="p">)</span>
+
+    <span class="nd">@Metadata</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">write</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">resource_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str[]: package resource names</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">resource</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">resource</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Package.add_resource"><a class="viewcode-back" href="../../api/external.html#frictionless.package.Package.add_resource">[docs]</a>    <span class="k">def</span> <span class="nf">add_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add new resource to package.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            descriptor (dict): resource descriptor</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Resource/None: added `Resource` instance or `None` if not added</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;resources&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;resources&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">descriptor</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Package.get_resource"><a class="viewcode-back" href="../../api/external.html#frictionless.package.Package.get_resource">[docs]</a>    <span class="k">def</span> <span class="nf">get_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get resource by name.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            name (str): resource name</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            FrictionlessException: if resource is not found</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">           Resource/None: `Resource` instance or `None` if not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">resource</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">resource</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">resource</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">PackageError</span><span class="p">(</span><span class="n">note</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;resource &quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&quot; does not exist&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">FrictionlessException</span><span class="p">(</span><span class="n">error</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Package.has_resource"><a class="viewcode-back" href="../../api/external.html#frictionless.package.Package.has_resource">[docs]</a>    <span class="k">def</span> <span class="nf">has_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if a resource is present</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            name (str): schema resource name</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">           bool: whether there is the resource</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">resource</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">resource</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Package.remove_resource"><a class="viewcode-back" href="../../api/external.html#frictionless.package.Package.remove_resource">[docs]</a>    <span class="k">def</span> <span class="nf">remove_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove resource by name.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            name (str): resource name</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            FrictionlessException: if resource is not found</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Resource/None: removed `Resource` instances or `None` if not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">resource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_resource</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">resource</span></div>
+
+    <span class="c1"># Expand</span>
+
+<div class="viewcode-block" id="Package.expand"><a class="viewcode-back" href="../../api/external.html#frictionless.package.Package.expand">[docs]</a>    <span class="k">def</span> <span class="nf">expand</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Expand metadata</span>
+
+<span class="sd">        It will add default values to the package.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;resources&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;profile&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">DEFAULT_PACKAGE_PROFILE</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">resource</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">:</span>
+            <span class="n">resource</span><span class="o">.</span><span class="n">expand</span><span class="p">()</span></div>
+
+    <span class="c1"># Infer</span>
+
+<div class="viewcode-block" id="Package.infer"><a class="viewcode-back" href="../../api/external.html#frictionless.package.Package.infer">[docs]</a>    <span class="k">def</span> <span class="nf">infer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">stats</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Infer package&#39;s attributes</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            stats? (bool): stream files completely and infer stats</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># General</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;profile&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">DEFAULT_PACKAGE_PROFILE</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">resource</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">:</span>
+            <span class="n">resource</span><span class="o">.</span><span class="n">infer</span><span class="p">(</span><span class="n">stats</span><span class="o">=</span><span class="n">stats</span><span class="p">)</span>
+
+        <span class="c1"># Deduplicate names</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resource_names</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resource_names</span><span class="p">)):</span>
+            <span class="n">seen_names</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resource_names</span><span class="p">):</span>
+                <span class="n">count</span> <span class="o">=</span> <span class="n">seen_names</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>
+                <span class="n">seen_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+    <span class="c1"># Import/Export</span>
+
+<div class="viewcode-block" id="Package.to_copy"><a class="viewcode-back" href="../../api/external.html#frictionless.package.Package.to_copy">[docs]</a>    <span class="k">def</span> <span class="nf">to_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a copy of the package&quot;&quot;&quot;</span>
+        <span class="n">descriptor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+        <span class="c1"># Resource&#39;s data can be not serializable (generators/functions)</span>
+        <span class="n">descriptor</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;resources&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">resources</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">resource</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">:</span>
+            <span class="n">resources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">to_copy</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">Package</span><span class="p">(</span>
+            <span class="n">descriptor</span><span class="p">,</span>
+            <span class="n">resources</span><span class="o">=</span><span class="n">resources</span><span class="p">,</span>
+            <span class="n">basepath</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__basepath</span><span class="p">,</span>
+            <span class="n">onerror</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__onerror</span><span class="p">,</span>
+            <span class="n">trusted</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__trusted</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Package.from_bigquery"><a class="viewcode-back" href="../../api/external.html#frictionless.package.Package.from_bigquery">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_bigquery</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Import package from Bigquery</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            source (string): BigQuery `Service` object</span>
+<span class="sd">            dialect (dict): BigQuery dialect</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Package: package</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">storage</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">create_storage</span><span class="p">(</span><span class="s2">&quot;bigquery&quot;</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="n">dialect</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">storage</span><span class="o">.</span><span class="n">read_package</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Package.to_bigquery"><a class="viewcode-back" href="../../api/external.html#frictionless.package.Package.to_bigquery">[docs]</a>    <span class="k">def</span> <span class="nf">to_bigquery</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Export package to Bigquery</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            target (string): BigQuery `Service` object</span>
+<span class="sd">            dialect (dict): BigQuery dialect</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            BigqueryStorage: storage</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">storage</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">create_storage</span><span class="p">(</span><span class="s2">&quot;bigquery&quot;</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="n">dialect</span><span class="p">)</span>
+        <span class="n">storage</span><span class="o">.</span><span class="n">write_package</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_copy</span><span class="p">(),</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">storage</span></div>
+
+<div class="viewcode-block" id="Package.from_ckan"><a class="viewcode-back" href="../../api/external.html#frictionless.package.Package.from_ckan">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_ckan</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Import package from CKAN</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            source (string): CKAN instance url e.g. &quot;https://demo.ckan.org&quot;</span>
+<span class="sd">            dialect (dict): CKAN dialect</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Package: package</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">storage</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">create_storage</span><span class="p">(</span><span class="s2">&quot;ckan&quot;</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="n">dialect</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">storage</span><span class="o">.</span><span class="n">read_package</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Package.to_ckan"><a class="viewcode-back" href="../../api/external.html#frictionless.package.Package.to_ckan">[docs]</a>    <span class="k">def</span> <span class="nf">to_ckan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Export package to CKAN</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            target (string): CKAN instance url e.g. &quot;https://demo.ckan.org&quot;</span>
+<span class="sd">            dialect (dict): CKAN dialect</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            CkanStorage: storage</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">storage</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">create_storage</span><span class="p">(</span><span class="s2">&quot;ckan&quot;</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="n">dialect</span><span class="p">)</span>
+        <span class="n">storage</span><span class="o">.</span><span class="n">write_package</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_copy</span><span class="p">(),</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">storage</span></div>
+
+<div class="viewcode-block" id="Package.from_sql"><a class="viewcode-back" href="../../api/external.html#frictionless.package.Package.from_sql">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_sql</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Import package from SQL</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            source (any): SQL connection string of engine</span>
+<span class="sd">            dialect (dict): SQL dialect</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Package: package</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">storage</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">create_storage</span><span class="p">(</span><span class="s2">&quot;sql&quot;</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="n">dialect</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">storage</span><span class="o">.</span><span class="n">read_package</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Package.to_sql"><a class="viewcode-back" href="../../api/external.html#frictionless.package.Package.to_sql">[docs]</a>    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Export package to SQL</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            target (any): SQL connection string of engine</span>
+<span class="sd">            dialect (dict): SQL dialect</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            SqlStorage: storage</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">storage</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">create_storage</span><span class="p">(</span><span class="s2">&quot;sql&quot;</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="n">dialect</span><span class="p">)</span>
+        <span class="n">storage</span><span class="o">.</span><span class="n">write_package</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_copy</span><span class="p">(),</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">storage</span></div>
+
+<div class="viewcode-block" id="Package.from_zip"><a class="viewcode-back" href="../../api/external.html#frictionless.package.Package.from_zip">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_zip</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a package from ZIP</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            path(str): file path</span>
+<span class="sd">            **options(dict): resouce options</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Package</span><span class="p">(</span><span class="n">descriptor</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Package.to_zip"><a class="viewcode-back" href="../../api/external.html#frictionless.package.Package.to_zip">[docs]</a>    <span class="k">def</span> <span class="nf">to_zip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">encoder_class</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Save package to a zip</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            path (str): target path</span>
+<span class="sd">            encoder_class (object): json encoder class</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            FrictionlessException: on any error</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">archive</span><span class="p">:</span>
+                <span class="n">package_descriptor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">resource</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">):</span>
+                    <span class="n">descriptor</span> <span class="o">=</span> <span class="n">package_descriptor</span><span class="p">[</span><span class="s2">&quot;resources&quot;</span><span class="p">][</span><span class="n">index</span><span class="p">]</span>
+
+                    <span class="c1"># Remote data</span>
+                    <span class="k">if</span> <span class="n">resource</span><span class="o">.</span><span class="n">remote</span><span class="p">:</span>
+                        <span class="k">pass</span>
+
+                    <span class="c1"># Memory data</span>
+                    <span class="k">elif</span> <span class="n">resource</span><span class="o">.</span><span class="n">memory</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                            <span class="n">path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">resource</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.csv&quot;</span>
+                            <span class="n">descriptor</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span>
+                            <span class="k">del</span> <span class="n">descriptor</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+                            <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">()</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+                                <span class="n">tgt</span> <span class="o">=</span> <span class="n">Resource</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="n">trusted</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                                <span class="n">resource</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tgt</span><span class="p">)</span>
+                                <span class="n">archive</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+                    <span class="c1"># Multipart data</span>
+                    <span class="k">elif</span> <span class="n">resource</span><span class="o">.</span><span class="n">multipart</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">fullpath</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">resource</span><span class="o">.</span><span class="n">fullpath</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fullpath</span><span class="p">):</span>
+                                <span class="k">if</span> <span class="ow">not</span> <span class="n">helpers</span><span class="o">.</span><span class="n">is_safe_path</span><span class="p">(</span><span class="n">fullpath</span><span class="p">):</span>
+                                    <span class="n">note</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Zipping usafe &quot;</span><span class="si">{</span><span class="n">fullpath</span><span class="si">}</span><span class="s1">&quot; is not supported&#39;</span>
+                                    <span class="n">error</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">PackageError</span><span class="p">(</span><span class="n">note</span><span class="o">=</span><span class="n">note</span><span class="p">)</span>
+                                    <span class="k">raise</span> <span class="n">FrictionlessException</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+                                <span class="n">archive</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fullpath</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+                    <span class="c1"># Local Data</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">path</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">path</span>
+                        <span class="n">fullpath</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">fullpath</span>
+                        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fullpath</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="n">helpers</span><span class="o">.</span><span class="n">is_safe_path</span><span class="p">(</span><span class="n">fullpath</span><span class="p">):</span>
+                                <span class="n">note</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Zipping usafe &quot;</span><span class="si">{</span><span class="n">fullpath</span><span class="si">}</span><span class="s1">&quot; is not supported&#39;</span>
+                                <span class="n">error</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">PackageError</span><span class="p">(</span><span class="n">note</span><span class="o">=</span><span class="n">note</span><span class="p">)</span>
+                                <span class="k">raise</span> <span class="n">FrictionlessException</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+                            <span class="n">archive</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fullpath</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+                <span class="c1"># Metadata</span>
+                <span class="n">archive</span><span class="o">.</span><span class="n">writestr</span><span class="p">(</span>
+                    <span class="s2">&quot;datapackage.json&quot;</span><span class="p">,</span>
+                    <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
+                        <span class="n">package_descriptor</span><span class="p">,</span>
+                        <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                        <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="bp">cls</span><span class="o">=</span><span class="n">encoder_class</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exception</span><span class="p">:</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">PackageError</span><span class="p">(</span><span class="n">note</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">exception</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">FrictionlessException</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">exception</span></div>
+
+    <span class="c1"># Metadata</span>
+
+    <span class="n">metadata_duplicate</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">metadata_Error</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">PackageError</span>  <span class="c1"># type: ignore</span>
+    <span class="n">metadata_profile</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">PACKAGE_PROFILE</span><span class="p">)</span>
+    <span class="n">metadata_profile</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;resources&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">}</span>
+
+<div class="viewcode-block" id="Package.metadata_process"><a class="viewcode-back" href="../../api/external.html#frictionless.package.Package.metadata_process">[docs]</a>    <span class="k">def</span> <span class="nf">metadata_process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="c1"># Resources</span>
+        <span class="n">resources</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;resources&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">resource</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">resources</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">Resource</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                        <span class="n">resource</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;resource</span><span class="si">{</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+                    <span class="n">resource</span> <span class="o">=</span> <span class="n">Resource</span><span class="p">(</span>
+                        <span class="n">resource</span><span class="p">,</span>
+                        <span class="n">basepath</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__basepath</span><span class="p">,</span>
+                        <span class="n">detector</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__detector</span><span class="p">,</span>
+                        <span class="n">hashing</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__hashing</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="nb">list</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">resource</span><span class="p">)</span>
+                <span class="n">resource</span><span class="o">.</span><span class="n">onerror</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__onerror</span>
+                <span class="n">resource</span><span class="o">.</span><span class="n">trusted</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__trusted</span>
+                <span class="n">resource</span><span class="o">.</span><span class="n">package</span> <span class="o">=</span> <span class="bp">self</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="n">helpers</span><span class="o">.</span><span class="n">ControlledList</span><span class="p">):</span>
+                <span class="n">resources</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">ControlledList</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span>
+                <span class="n">resources</span><span class="o">.</span><span class="n">__onchange__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata_process</span><span class="p">)</span>
+                <span class="nb">dict</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;resources&quot;</span><span class="p">,</span> <span class="n">resources</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Package.metadata_validate"><a class="viewcode-back" href="../../api/external.html#frictionless.package.Package.metadata_validate">[docs]</a>    <span class="k">def</span> <span class="nf">metadata_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">yield from</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">metadata_validate</span><span class="p">()</span>
+
+        <span class="c1"># Extensions</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">profile</span> <span class="o">==</span> <span class="s2">&quot;fiscal-data-package&quot;</span><span class="p">:</span>
+            <span class="k">yield from</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">metadata_validate</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">FISCAL_PACKAGE_PROFILE</span><span class="p">)</span>
+
+        <span class="c1"># Resources</span>
+        <span class="k">for</span> <span class="n">resource</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">:</span>
+            <span class="k">yield from</span> <span class="n">resource</span><span class="o">.</span><span class="n">metadata_errors</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, SENTINEL Project.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

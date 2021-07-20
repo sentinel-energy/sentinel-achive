@@ -1,0 +1,458 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Converting to IAMC format &mdash; friendly_data 0.2.2.dev documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> friendly_data
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hands-on.html">Hands-on tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../registry.html">Data registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced.html">Advanced use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devnotes.html">Notes for developers</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">friendly_data</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Converting to IAMC format</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/tutorial/iamc-conversion.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="converting-to-iamc-format">
+<h1>Converting to IAMC format<a class="headerlink" href="#converting-to-iamc-format" title="Permalink to this headline">¶</a></h1>
+<p>The IAMC format from the IAM consortium is popular in the energy
+modelling community.  So Friendly data provides workflows to convert a
+data package to IAMC output with some configuration.</p>
+<p>The IAMC format allows the user to define their own hierarchy of
+variables.  So when using Friendly data, you can associate specific
+files to different branches of the hierarchy.  There are currently
+two ways of specifying this:
+1. use a fixed string, and
+2. use a format string with one or more user defined index columns.</p>
+<p>A format string can be specified in the index file by adding an <cite>iamc</cite>
+key.  If the string contains a column name enclosed in braces, when
+creating the IAMC file, corresponding values from the index column
+will be substituted in that position.</p>
+<p>Let us consider the <a class="reference external" href="https://github.com/sentinel-energy/friendly_data_example">example data package</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ tree
+.
+├── carrier.csv
+├── conf.yaml
+├── data
+│   ├── flow_in_25.csv
+│   ├── flow_in_50.csv
+│   ├── flow_in_sum.csv
+.   .
+.   .
+│   ├── flow_out_sum_const1.csv
+│   ├── flow_out_sum_multi.csv
+.   .
+.   .
+├── datapackage.json
+├── index.yaml
+├── LICENSE
+├── README.md
+└── technology.csv
+</pre></div>
+</div>
+<p>If we consider the dataset <cite>flow_in_sum.csv</cite>, which looks like:</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Energy flow in</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>techs</p></th>
+<th class="head"><p>scenario</p></th>
+<th class="head"><p>year</p></th>
+<th class="head"><p>locs</p></th>
+<th class="head"><p>unit</p></th>
+<th class="head"><p>flow_in_sum</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>electric_heater</p></td>
+<td><p>climate_neutrality</p></td>
+<td><p>2050</p></td>
+<td><p>AUT</p></td>
+<td><p>twh</p></td>
+<td><p>27.39620468870247</p></td>
+</tr>
+<tr class="row-odd"><td><p>electric_heater</p></td>
+<td><p>climate_neutrality</p></td>
+<td><p>2050</p></td>
+<td><p>BEL</p></td>
+<td><p>twh</p></td>
+<td><p>43.24801979081346</p></td>
+</tr>
+<tr class="row-even"><td><p>…</p></td>
+<td><p>…</p></td>
+<td><p>…</p></td>
+<td><p>…</p></td>
+<td><p>…</p></td>
+<td><p>…</p></td>
+</tr>
+<tr class="row-odd"><td><p>light_transport_ev</p></td>
+<td><p>climate_neutrality</p></td>
+<td><p>2050</p></td>
+<td><p>AUT</p></td>
+<td><p>twh</p></td>
+<td><p>29.348459228522366</p></td>
+</tr>
+<tr class="row-even"><td><p>light_transport_ev</p></td>
+<td><p>climate_neutrality</p></td>
+<td><p>2050</p></td>
+<td><p>BEL</p></td>
+<td><p>twh</p></td>
+<td><p>42.41184567122542</p></td>
+</tr>
+</tbody>
+</table>
+<p>The IAMC format requires that the data have the columns: <cite>model</cite>,
+<cite>scenario</cite>, <cite>region</cite>, <cite>variable</cite>, <cite>unit</cite>, and <cite>value</cite>.  If the data is
+in “long format”, then it should also have a column <cite>year</cite>.  In the
+above dataset, <cite>locs</cite> is an alias for <cite>region</cite>, but there are no
+columns for <cite>model</cite>, <cite>variable</cite>, or <cite>value</cite>, and there is an
+additional column called <cite>techs</cite>.</p>
+<p>The corresponding entry in the index file looks something like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">alias</span><span class="p">:</span>
+    <span class="n">locs</span><span class="p">:</span> <span class="n">region</span>
+    <span class="n">techs</span><span class="p">:</span> <span class="n">technology</span>
+  <span class="n">iamc</span><span class="p">:</span> <span class="n">Hourly</span> <span class="n">power</span> <span class="n">consumption</span><span class="o">|</span><span class="n">Yearly</span><span class="o">|</span><span class="p">{</span><span class="n">technology</span><span class="p">}</span>
+  <span class="n">idxcols</span><span class="p">:</span>
+  <span class="o">-</span> <span class="n">techs</span>
+  <span class="o">-</span> <span class="n">scenario</span>
+  <span class="o">-</span> <span class="n">year</span>
+  <span class="o">-</span> <span class="n">locs</span>
+  <span class="o">-</span> <span class="n">unit</span>
+  <span class="n">name</span><span class="p">:</span> <span class="n">Hourly</span> <span class="n">power</span> <span class="n">consumption</span><span class="o">|</span><span class="n">Yearly</span>
+  <span class="n">path</span><span class="p">:</span> <span class="n">data</span><span class="o">/</span><span class="n">flow_in_sum</span><span class="o">.</span><span class="n">csv</span>
+</pre></div>
+</div>
+<p>The <cite>alias</cite> key declares that, <cite>techs</cite> is to be treated as
+<cite>technology</cite>, and <cite>locs</cite> as <cite>region</cite> - that satisfies one of the
+missing columns required by the IAMC specification.  You will also
+note, there is a <cite>iamc</cite> key.  This mentions <cite>technology</cite> in <code class="docutils literal notranslate"><span class="pre">{...}</span></code>.
+This is a format string, which means all occurences of <cite>technology</cite>
+are to be replaced by the corresponding values in data; in this case
+<cite>electric_heater</cite> and <cite>light_transport_ev</cite>.  The resulting string is
+then available under the <cite>variable</cite> column.  However you will note,
+the technology names are not particularly descriptive, so you probably
+want to replace them with something more commonly used in an IAMC
+dataset.  These alternate names can be specified in a separate CSV
+file, and provided in the configuration file.  If we refer to the
+<a class="reference external" href="https://github.com/sentinel-energy/friendly_data_example">example data package</a>, we will find a <code class="docutils literal notranslate"><span class="pre">conf.yaml</span></code> file, which has
+a section like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">indices</span><span class="p">:</span>
+  <span class="n">technology</span><span class="p">:</span> <span class="n">technology</span><span class="o">.</span><span class="n">csv</span>
+  <span class="n">carrier</span><span class="p">:</span> <span class="n">carrier</span><span class="o">.</span><span class="n">csv</span>
+  <span class="n">model</span><span class="p">:</span> <span class="n">calliope</span>
+</pre></div>
+</div>
+<p>The above configures technology names to be resolved as per
+<code class="docutils literal notranslate"><span class="pre">technology.csv</span></code>, which looks like this:</p>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text">Technology definitions</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>iamc</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>electric_heater</p></td>
+<td><p>Electricity|Heating</p></td>
+</tr>
+<tr class="row-odd"><td><p>light_transport_ev</p></td>
+<td><p>Electricity|Road</p></td>
+</tr>
+</tbody>
+</table>
+<p>In the same configuration snippet, you can see there’s a key for
+<cite>model</cite>, but instead of pointing to a file like <cite>technology</cite>, it
+specifies a string.  If a <cite>model</cite> column does not exist in your
+dataset, this string will be taken as the default value for such a
+column.  This leaves only the <cite>value</cite> column, which is nothing but the
+data column, in our example, <cite>flow_in_sum</cite>.  And we have our data in
+IAMC format!</p>
+<table class="docutils align-default" id="id3">
+<caption><span class="caption-text">Data in IAMC format</span><a class="headerlink" href="#id3" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>model</p></th>
+<th class="head"><p>scenario</p></th>
+<th class="head"><p>region</p></th>
+<th class="head"><p>variable</p></th>
+<th class="head"><p>unit</p></th>
+<th class="head"><p>year</p></th>
+<th class="head"><p>value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>calliope</p></td>
+<td><p>climate_neutrality</p></td>
+<td><p>AUT</p></td>
+<td><p>Hourly power consumption|Yearly|Electricity|Heating</p></td>
+<td><p>twh</p></td>
+<td><p>2050</p></td>
+<td><p>27.39620468870247</p></td>
+</tr>
+<tr class="row-odd"><td><p>calliope</p></td>
+<td><p>climate_neutrality</p></td>
+<td><p>BEL</p></td>
+<td><p>Hourly power consumption|Yearly|Electricity|Heating</p></td>
+<td><p>twh</p></td>
+<td><p>2050</p></td>
+<td><p>43.24801979081346</p></td>
+</tr>
+<tr class="row-even"><td><p>…</p></td>
+<td><p>…</p></td>
+<td><p>…</p></td>
+<td><p>…</p></td>
+<td><p>…</p></td>
+<td><p>…</p></td>
+<td><p>…</p></td>
+</tr>
+<tr class="row-odd"><td><p>calliope</p></td>
+<td><p>climate_neutrality</p></td>
+<td><p>AUT</p></td>
+<td><p>Hourly power consumption|Yearly|Electricity|Road</p></td>
+<td><p>twh</p></td>
+<td><p>2050</p></td>
+<td><p>29.348459228522366</p></td>
+</tr>
+<tr class="row-even"><td><p>calliope</p></td>
+<td><p>climate_neutrality</p></td>
+<td><p>BEL</p></td>
+<td><p>Hourly power consumption|Yearly|Electricity|Road</p></td>
+<td><p>twh</p></td>
+<td><p>2050</p></td>
+<td><p>42.41184567122542</p></td>
+</tr>
+</tbody>
+</table>
+<p>This kind of replacement
+from values in the dataset can de done with multiple columns, e.g. the
+index entry for <cite>flow_out_25_multi.csv</cite> looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">iamc</span><span class="p">:</span> <span class="n">Generation</span><span class="o">|</span><span class="n">Percentile</span> <span class="mi">25</span><span class="o">|</span><span class="p">{</span><span class="n">carrier</span><span class="p">}</span><span class="o">|</span><span class="p">{</span><span class="n">technology</span><span class="p">}</span>
+  <span class="n">idxcols</span><span class="p">:</span>
+  <span class="o">-</span> <span class="n">carrier</span>
+  <span class="o">-</span> <span class="n">technology</span>
+  <span class="o">-</span> <span class="n">scenario</span>
+  <span class="o">-</span> <span class="n">year</span>
+  <span class="o">-</span> <span class="n">region</span>
+  <span class="o">-</span> <span class="n">unit</span>
+  <span class="n">name</span><span class="p">:</span> <span class="n">Generation</span><span class="o">|</span><span class="n">Percentile</span> <span class="mi">25</span>
+  <span class="n">path</span><span class="p">:</span> <span class="n">data</span><span class="o">/</span><span class="n">flow_out_25_multi</span><span class="o">.</span><span class="n">csv</span>
+</pre></div>
+</div>
+<p>Here, all possible combinations of <cite>technology</cite> and <cite>carrier</cite> will be
+tried, and only the ones present in the data will be included in the
+final output.  If you do not need something like this, you can always
+use a regular string (without any <code class="docutils literal notranslate"><span class="pre">{...}</span></code>) to denote what should be
+in the <cite>variable</cite> column (see the <a class="reference external" href="https://github.com/sentinel-energy/friendly_data_example">example data package</a> for other
+examples).</p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, SENTINEL Project.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
